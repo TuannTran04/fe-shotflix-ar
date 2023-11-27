@@ -52,7 +52,8 @@ export async function generateMetadata({}) {
       `${process.env.NEXT_PUBLIC_URL}/api/v1/info_shotflix`
     );
 
-    if (!res && !res.data?.data) {
+    console.log("res meta", !res.data.data && res.data.data[0]);
+    if (!res?.data && res.data.data[0]) {
       return {
         title: "Không tìm thấy",
         description: "Trang này không tồn tại",
