@@ -12,37 +12,37 @@ import axios from "axios";
 
 // const inter = Inter({ subsets: ['latin'] })
 
-// export const metadata = {
-//   metadataBase: new URL("http://localhost:3001"),
-//   title: {
-//     default: "Shotflix",
-//     template: `%s | Shotflix`,
-//   },
-//   description:
-//     "Đây là trang web xem phim ngắn. Một 'sân chơi' dành cho các bạn trẻ đam mê nghệ thuật, điện ảnh...",
-//   keywords: "từ-khóa-1, từ-khóa-2, từ-khóa-3",
-//   robots: {
-//     index: true,
-//     follow: true,
-//     // nocache: true,
-//   },
-//   // alternates: {
-//   //   canonical: `/xem-phim/${movie.slug}`,
-//   //   languages: {
-//   //     "vi-VN": `/vi-VN/xem-phim/${movie.slug}`,
-//   //   },
-//   // },
-//   openGraph: {
-//     title: "Shotflix",
-//     description:
-//       "Đây là trang web xem phim ngắn. Một 'sân chơi' dành cho các bạn trẻ đam mê nghệ thuật, điện ảnh...",
-//     locale: "vi_VN",
-//     type: "video.movie",
-//     url: `/`,
-//     siteName: "Shotflix",
-//     // images: [movie.photo[0]],
-//   },
-// };
+export const metadata = {
+  metadataBase: new URL("http://localhost:3001"),
+  title: {
+    default: "Shotflix",
+    template: `%s | Shotflix`,
+  },
+  // description:
+  //   "Đây là trang web xem phim ngắn. Một 'sân chơi' dành cho các bạn trẻ đam mê nghệ thuật, điện ảnh...",
+  // keywords: "từ-khóa-1, từ-khóa-2, từ-khóa-3",
+  robots: {
+    index: true,
+    follow: true,
+    // nocache: true,
+  },
+  // alternates: {
+  //   canonical: `/xem-phim/${movie.slug}`,
+  //   languages: {
+  //     "vi-VN": `/vi-VN/xem-phim/${movie.slug}`,
+  //   },
+  // },
+  openGraph: {
+    // title: "Shotflix",
+    // description:
+    //   "Đây là trang web xem phim ngắn. Một 'sân chơi' dành cho các bạn trẻ đam mê nghệ thuật, điện ảnh...",
+    // locale: "vi_VN",
+    // type: "video.movie",
+    // url: `/`,
+    // siteName: "Shotflix",
+    images: [],
+  },
+};
 
 export async function generateMetadata({}) {
   // const nameFilm = params.nameFilm;
