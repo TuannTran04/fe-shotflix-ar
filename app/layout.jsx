@@ -52,15 +52,15 @@ export async function generateMetadata({}) {
       `${process.env.NEXT_PUBLIC_URL}/api/v1/info_shotflix`
     );
 
-    console.log("res meta", !res.data.data && res.data.data[0]);
-    if (!res?.data && res.data.data[0]) {
-      return {
-        title: "Không tìm thấy",
-        description: "Trang này không tồn tại",
-      };
-    }
+    // console.log("res meta", !res.data.data && res.data.data[0]);
+    // if (!res?.data && res.data.data[0]) {
+    //   return {
+    //     title: "Không tìm thấy",
+    //     description: "Trang này không tồn tại",
+    //   };
+    // }
 
-    let infoShotflix = res.data.data[0];
+    let infoShotflix = res?.data?.data?.[0];
 
     console.log("res meta", infoShotflix);
 
