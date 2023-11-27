@@ -62,14 +62,23 @@ export async function generateMetadata({}) {
 
     let infoShotflix = res?.data?.data?.[0];
 
+    if (!infoShotflix) {
+      return {
+        title: "Không tìm thấy title",
+        description: "Trang này không tồn tại",
+      };
+    }
+
     console.log("res meta", infoShotflix);
 
     return {
       metadataBase: new URL("http://localhost:3001"),
 
       title: {
-        default: infoShotflix?.title,
-        template: `%s | ${infoShotflix?.title}`,
+        default: infoShotflix?.title ? infoShotflix?.title : "Shotflix",
+        template: `%s | ${
+          infoShotflix?.title ? infoShotflix?.title : "Shotflix"
+        }`,
       },
       description: infoShotflix.description,
       keywords: infoShotflix.keyword,
@@ -91,7 +100,11 @@ export async function generateMetadata({}) {
         type: infoShotflix.typeWeb,
         url: infoShotflix.urlWeb,
         siteName: infoShotflix.siteName,
-        images: [infoShotflix?.photo?.[0]] || "test",
+        images: [
+          infoShotflix?.photo?.[0]
+            ? infoShotflix?.photo?.[0]
+            : "https://firebasestorage.googleapis.com/v0/b/prj-cv-film.appspot.com/o/images_seo_shotflix%2Flogo_shotflix.png?alt=media&token=552dbdfc-2dde-4376-bc44-500179bc9f63",
+        ],
       },
     };
   } catch (err) {
