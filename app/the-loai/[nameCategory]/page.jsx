@@ -20,6 +20,7 @@ const CategoryPage = ({ params }) => {
 
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const [arrMovie, setArrMovie] = useState([]);
   const [currentPage, setCurrentPage] = useState(parseInt(pageNumber) || 1);
@@ -45,9 +46,11 @@ const CategoryPage = ({ params }) => {
           console.log(">>> Category Film <<<", res?.data.data.totalCount);
           setArrMovie(res?.data.data.movies);
           setTotalPages(Math.ceil(res?.data.data.totalCount / pageSize));
+          setIsLoading(false);
         }
       } catch (err) {
         console.log(err);
+        setIsLoading(false);
       }
     };
     renderMoviesByCategory();
@@ -90,7 +93,7 @@ const CategoryPage = ({ params }) => {
           styleTitle="text-[#da966e] text-2xl font-normal border-l-4 pl-2.5"
         />
 
-        <LayoutAllFilm arrMovie={arrMovie} />
+        <LayoutAllFilm arrMovie={arrMovie} isLoading={isLoading} />
 
         {arrMovie.length !== 0 ? (
           <Pagination

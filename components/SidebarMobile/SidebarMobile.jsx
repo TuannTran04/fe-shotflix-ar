@@ -5,6 +5,7 @@ import { Navigation } from "react-minimal-side-navigation";
 import "react-minimal-side-navigation/lib/ReactMinimalSideNavigation.css";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../store/apiRequest";
+import Notification from "../Notification/Notification";
 
 const SidebarHomeMobile = ({
   categories,
@@ -104,6 +105,11 @@ const SidebarHomeMobile = ({
               </div>
             )}
           </div>
+
+          {/* <div className="mb-2">
+            <p className="text-white">Thông báo</p>
+            <Notification />
+          </div> */}
 
           <div className="sidebarMobile">
             <Navigation

@@ -63,7 +63,7 @@ const UserManagePage = ({ params }) => {
           setCategories(categories);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        // console.error("Error fetching data:", error);
       }
     };
 

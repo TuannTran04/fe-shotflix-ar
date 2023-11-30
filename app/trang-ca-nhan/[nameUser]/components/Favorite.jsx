@@ -1,13 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createAxios } from "../../../../utils/createInstance";
 import { useState } from "react";
-import {
-  deleteBookmarkMovie,
-  deleteFavoriteMovie,
-} from "../../../../store/apiRequest";
+import { deleteFavoriteMovie } from "../../../../store/apiRequest";
 import Link from "next/link";
 import Image from "next/legacy/image";
+import { addArrFavorite } from "@/store/filmSlice";
 
 const Favorite = ({ movie, toast, setArrFavoriteMovie }) => {
   const user = useSelector((state) => state.auth.login.currentUser);
@@ -16,11 +14,16 @@ const Favorite = ({ movie, toast, setArrFavoriteMovie }) => {
   const accessToken = user?.accessToken;
   const [showMenu, setShowMenu] = useState(false);
 
+  const film = useSelector((state) => state.film);
+  const { favoriteFilm } = film;
+
+  const containerMenu = useRef(null);
+  const btnShowMenuFilm = useRef(null);
+
   const handleShowMenuMovie = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setShowMenu(!showMenu);
-    console.log("toggle");
   };
 
   const handleDeleteFavorite = async (e) => {
@@ -31,31 +34,52 @@ const Favorite = ({ movie, toast, setArrFavoriteMovie }) => {
         toast.warning("Đăng nhập để sử dụng tính năng này");
         return;
       }
-      const res = await deleteFavoriteMovie(userId, movie._id);
-      // console.log(">>> deleteFavoriteMovie <<<", res);
 
-      setArrFavoriteMovie((prevFavorires) => {
-        return prevFavorires.filter((favorite) => favorite._id !== movie._id);
-      });
-      toast.success(res?.data?.message);
+      if (
+        window.confirm(
+          `Bạn có chắc muốn xóa ${movie?.title} khỏi danh sách yêu thích không?`
+        )
+      ) {
+        const res = await deleteFavoriteMovie(userId, movie._id);
+        // console.log(">>> deleteFavoriteMovie <<<", res);
+
+        setArrFavoriteMovie((prevFavorires) => {
+          return prevFavorires.filter((favorite) => favorite._id !== movie._id);
+        });
+
+        const newArrFavMovie = favoriteFilm.filter(
+          (film) => film._id !== movie._id
+        );
+        // console.log("newArrFavMovie", newArrFavMovie);
+
+        if (res.status === 200) {
+          dispatch(addArrFavorite([...newArrFavMovie]));
+          toast.success(res?.data?.message);
+        }
+      }
     } catch (err) {
-      console.log(err);
       throw new Error(err);
     }
   };
 
-  // const handleDeleteBookmark = async (e) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   try {
-  //     const res = await deleteBookmarkMovie(userId, movie._id);
-  //     console.log(res);
-  //     toast(res?.data?.message);
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw new Error(err);
-  //   }
-  // };
+  // Sự kiện lắng nghe khi click chuột toàn trang
+  useEffect(() => {
+    const handleClickOutsideHideMenu = (e) => {
+      // Kiểm tra nếu kết quả đang hiển thị và chuột không nằm trong phần tử kết quả
+      if (
+        !containerMenu.current?.contains(e.target) &&
+        e.target != btnShowMenuFilm.current &&
+        !btnShowMenuFilm.current?.contains(e.target)
+      ) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutsideHideMenu);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideHideMenu);
+    };
+  }, []);
 
   return (
     <div className="">
@@ -74,27 +98,30 @@ const Favorite = ({ movie, toast, setArrFavoriteMovie }) => {
           <i className="fa-regular fa-circle-play text-4xl"></i>
         </span>
 
-        <span
-          className="h-[20px] w-[20px] absolute top-0 right-0 bg-white cursor-pointer z-30"
-          onClick={handleShowMenuMovie}
-        >
-          <i className="fa-solid fa-ellipsis-vertical absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-30"></i>
+        <span className="h-[20px] w-[20px] absolute top-0 right-0 z-50">
+          <span
+            className={`block h-full w-full bg-[rgba(255,255,255,0.6)] cursor-pointer z-50 hover:bg-[rgba(255,255,255,1)] ${
+              showMenu ? "bg-[rgba(255,255,255,1)]" : ""
+            }`}
+            ref={btnShowMenuFilm}
+            onClick={handleShowMenuMovie}
+          >
+            <i className="fa-solid fa-ellipsis-vertical absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-50"></i>
+          </span>
+
           {showMenu && (
-            <span className="py-1 absolute top-0 right-[100%] bg-white min-w-[100px] z-40">
+            <span
+              className="py-1 absolute top-0 right-[100%] bg-white min-w-[100px] z-40"
+              ref={containerMenu}
+            >
               <span
                 className="px-2 flex justify-start items-center hover:bg-[rgba(0,0,0,0.3)] z-50"
                 onClick={handleDeleteFavorite}
               >
                 <p className="flex-1 w-full whitespace-nowrap">Xóa yêu thích</p>
-                <i className="fa-regular fa-heart ml-1 my-auto"></i>
+                {/* <i className="fa-regular fa-heart ml-1 my-auto"></i> */}
+                <i className="fa-solid fa-heart ml-1 my-auto"></i>
               </span>
-              {/* <span
-                className="px-2 flex justify-start items-center mb-1 hover:bg-[rgba(0,0,0,0.3)] z-50"
-                onClick={handleDeleteBookmark}
-              >
-                <p className="flex-1 w-full whitespace-nowrap">Xóa xem sau</p>
-                <i className="fa-regular fa-clock ml-1 my-auto"></i>
-              </span> */}
             </span>
           )}
         </span>

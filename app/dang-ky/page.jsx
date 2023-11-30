@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { registerOTP } from "@/store/apiRequest";
+import Loading from "@/components/Loading/Loading";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -22,6 +23,7 @@ const RegisterPage = () => {
       .string()
       .oneOf([yup.ref("password"), null], "Passwords must match")
       .required("Confirm Password is required"),
+    // otp: yup.string().min(6).max(20).required(),
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +31,8 @@ const RegisterPage = () => {
     setShowPassword(!showPassword);
   };
   const [verifyOTP, setVerifyOTP] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -100,14 +104,23 @@ const RegisterPage = () => {
   // };
 
   const onSubmit = async (dataForm) => {
-    registerOTP(dataForm, verifyOTP, setVerifyOTP, dispatch, router, toast);
+    registerOTP(
+      dataForm,
+      verifyOTP,
+      setVerifyOTP,
+      dispatch,
+      router,
+      toast,
+      setIsLoading
+    );
   };
 
   const reGeneratorOTP = async () => {
     const base_url = process.env.NEXT_PUBLIC_URL;
     const dataForm = { username, email, password };
     try {
-      if ((username, email, password)) {
+      setIsLoading(true);
+      if (username && email && password) {
         const response = await axios.post(
           `${base_url}/api/v1/auth/register`,
           dataForm
@@ -116,11 +129,17 @@ const RegisterPage = () => {
         if (response.status === 200) {
           setVerifyOTP(true);
           console.log(response.data);
+          setIsLoading(false);
           toast(response?.data?.message);
         }
+      } else {
+        setIsLoading(false);
+        toast("Hãy điền đầy đủ các trường");
       }
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
+
       if (error.response.data.mes.code === 11000) {
         toast(`${Object.keys(error.response.data.mes.keyValue)[0]} đã tồn tại`);
       }
@@ -237,6 +256,7 @@ const RegisterPage = () => {
                     <input
                       className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="..."
+                      required
                       {...register("otp", { required: true })}
                     />
                   </div>
@@ -279,12 +299,20 @@ const RegisterPage = () => {
                 </div>
               </div> */}
 
-              <button
-                type="submit"
-                className="w-full text-white bg-black hover:opacity-70 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Đăng ký
-              </button>
+              {!isLoading && (
+                <button
+                  type="submit"
+                  className="w-full text-white bg-black hover:opacity-70 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >
+                  Đăng ký
+                </button>
+              )}
+              {isLoading && (
+                <div className="w-full text-white bg-black focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                  <Loading />
+                </div>
+              )}
+
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Bạn đã có tài khoản?{" "}
                 <Link

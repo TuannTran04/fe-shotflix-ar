@@ -30,7 +30,7 @@ const EditInfoUser = ({ params }) => {
   const accessToken = user?.accessToken;
   const refreshToken = user?.refreshToken;
   // let axiosJWT = createAxios(user, null, null);
-  let axiosJWT = createAxios(user, dispatch, loginSuccess);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
 
   const userId = user?._id;
 

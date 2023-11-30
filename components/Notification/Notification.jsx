@@ -55,7 +55,8 @@ function timeAgo(createdAt) {
 const Notification = ({}) => {
   const socket = useRef();
   const notifyRef = useRef();
-  // console.log(notifyRef.current);
+  const containerMenuActionsRef = useRef();
+  console.log(containerMenuActionsRef.current);
 
   const router = useRouter();
   const user = useSelector((state) => state.auth.login.currentUser);
@@ -166,6 +167,10 @@ const Notification = ({}) => {
       ) {
         // Ẩn thông báo khi người dùng nhấp chuột ra ngoài
         setShowNotification(false);
+        setShowMenuCommentNotification(null);
+      }
+
+      if (!containerMenuActionsRef.current?.contains(e.target)) {
         setShowMenuCommentNotification(null);
       }
     };
@@ -414,13 +419,24 @@ const Notification = ({}) => {
                       </Link>
 
                       <span
-                        className="relative flex justify-center items-center h-[40px] w-[30px] select-none cursor-pointer hover:bg-white group"
+                        className={`relative flex justify-center items-center h-[40px] w-[30px] select-none cursor-pointer hover:bg-white group ${
+                          item._id === showMenuNotification ? "bg-white" : ""
+                        }`}
                         onClick={() => handleShowMenuNotification(item._id)}
                       >
-                        <i className="fa-solid fa-ellipsis-vertical text-white group-hover:text-black"></i>
+                        <i
+                          className={`fa-solid fa-ellipsis-vertical group-hover:text-black ${
+                            item._id === showMenuNotification
+                              ? "text-black"
+                              : "text-white"
+                          }`}
+                        ></i>
 
                         {item._id === showMenuNotification && (
-                          <span className="py-1 absolute top-0 right-[30px] md:right-[30px] bg-white min-w-[100px] z-40 select-none">
+                          <span
+                            ref={containerMenuActionsRef}
+                            className="py-1 absolute top-0 right-[100%] bg-white min-w-[100px] border-[1px] z-40 select-none"
+                          >
                             <span
                               className="px-2 flex justify-start items-center hover:bg-[rgba(0,0,0,0.3)] cursor-pointer"
                               onClick={() => deleteNotification(item._id)}

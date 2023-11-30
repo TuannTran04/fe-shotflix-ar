@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import Link from "next/link";
 import { forgotPwdUser } from "@/services/userRequest";
+import Loading from "@/components/Loading/Loading";
 
 const ForgetPage = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const ForgetPage = () => {
     setShowPassword(!showPassword);
   };
   const [verifyOTP, setVerifyOTP] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -46,14 +48,24 @@ const ForgetPage = () => {
 
   const onSubmit = async (data) => {
     // console.log(">>> Data FORGET <<<", data);
-    forgotPwdUser(data, router, dispatch, toast, verifyOTP, setVerifyOTP);
+    forgotPwdUser(
+      data,
+      router,
+      dispatch,
+      toast,
+      verifyOTP,
+      setVerifyOTP,
+      setIsLoading
+    );
   };
 
   const reGeneratorOTP = async () => {
     const base_url = process.env.NEXT_PUBLIC_URL;
     const dataForm = { email, password };
     try {
-      if ((email, password)) {
+      setIsLoading(true);
+
+      if (email && password) {
         const response = await axios.put(
           `${base_url}/api/v1/auth/forgot-pwd-user`,
           dataForm
@@ -62,11 +74,17 @@ const ForgetPage = () => {
         if (response.status === 200) {
           setVerifyOTP(true);
           console.log(response.data);
+          setIsLoading(false);
           toast(response?.data?.message);
         }
+      } else {
+        setIsLoading(false);
+        toast("Hãy điền đầy đủ các trường");
       }
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
+
       if (error?.response?.data?.code == 400) {
         toast(error?.response?.data?.mes);
       }
@@ -105,7 +123,7 @@ const ForgetPage = () => {
 
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Nhập mật khẩu
+                  Nhập mật khẩu mới
                 </label>
 
                 <div className="relative">
@@ -205,12 +223,20 @@ const ForgetPage = () => {
                 </div>
               </div> */}
 
-              <button
-                type="submit"
-                className="w-full text-white bg-black hover:opacity-70 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Lưu
-              </button>
+              {!isLoading && (
+                <button
+                  type="submit"
+                  className="w-full text-white bg-black hover:opacity-70 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >
+                  Lưu
+                </button>
+              )}
+
+              {isLoading && (
+                <div className="w-full text-white bg-black focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                  <Loading />
+                </div>
+              )}
 
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Bạn chưa có tài khoản?{" "}

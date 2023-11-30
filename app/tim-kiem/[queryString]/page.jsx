@@ -20,9 +20,11 @@ const SearchFilmPage = ({ params }) => {
   const [categories, setCategories] = useState([]);
 
   const [arrMovie, setArrMovie] = useState([]);
-  console.log(queryString);
-  console.log(decodeURIComponent(queryString));
-  console.log(decodeURIComponent(queryString).replace(/\+/g, " "));
+  const [isLoading, setIsLoading] = useState(true);
+
+  // console.log(queryString);
+  // console.log(decodeURIComponent(queryString));
+  // console.log(decodeURIComponent(queryString).replace(/\+/g, " "));
 
   useEffect(() => {
     const renderSearchMovies = async () => {
@@ -31,11 +33,14 @@ const SearchFilmPage = ({ params }) => {
         // console.log(">>> Results Search <<<", res);
         if (res.data.code === 200) {
           setArrMovie(res.data.data.movies);
+          setIsLoading(false);
         } else {
           setArrMovie([]);
+          setIsLoading(false);
         }
       } catch (err) {
         console.log(err);
+        setIsLoading(false);
       }
     };
     renderSearchMovies();
@@ -70,7 +75,7 @@ const SearchFilmPage = ({ params }) => {
           styleTitle="text-[#da966e] text-2xl font-normal border-l-4 pl-2.5"
         />
 
-        <LayoutAllFilm arrMovie={arrMovie} />
+        <LayoutAllFilm arrMovie={arrMovie} isLoading={isLoading} />
       </div>
     </LayoutRoot>
   );

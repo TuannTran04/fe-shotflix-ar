@@ -2,12 +2,7 @@ import Image from "next/legacy/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getFavoriteMovies,
-  getWatchLaterMovies,
-  addBookmarkMovie,
-  addFavoriteMovie,
-} from "../../../store/apiRequest";
+import { addBookmarkMovie, addFavoriteMovie } from "../../../store/apiRequest";
 import { createAxios } from "../../../utils/createInstance";
 
 const Movie = ({ item, toast }) => {
@@ -33,9 +28,16 @@ const Movie = ({ item, toast }) => {
         toast.warning("Đăng nhập để sử dụng tính năng này");
         return;
       }
-      const res = await addFavoriteMovie(userId, _id);
-      console.log(">>> addFavoriteMovie <<<", res);
-      toast.success(res?.data?.message);
+
+      if (
+        window.confirm(
+          `Bạn có chắc muốn thêm ${title} vào danh sách yêu thích không?`
+        )
+      ) {
+        const res = await addFavoriteMovie(userId, _id);
+        console.log(">>> addFavoriteMovie <<<", res);
+        toast.success(res?.data?.message);
+      }
     } catch (err) {
       console.log(err);
       throw new Error(err);
@@ -50,9 +52,16 @@ const Movie = ({ item, toast }) => {
         toast.warning("Đăng nhập để sử dụng tính năng này");
         return;
       }
-      const res = await addBookmarkMovie(userId, _id);
-      console.log(res);
-      toast.success(res?.data?.message);
+
+      if (
+        window.confirm(
+          `Bạn có chắc muốn thêm ${title} vào danh sách xem sau không?`
+        )
+      ) {
+        const res = await addBookmarkMovie(userId, _id);
+        console.log(res);
+        toast.success(res?.data?.message);
+      }
     } catch (err) {
       console.log(err);
       throw new Error(err);

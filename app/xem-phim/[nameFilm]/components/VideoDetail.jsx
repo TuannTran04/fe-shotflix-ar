@@ -8,10 +8,14 @@ import "react-toastify/dist/ReactToastify.css";
 import { createAxios } from "../../../../utils/createInstance";
 import { loginSuccess } from "../../../../store/authSlice";
 import Image from "next/legacy/image";
+import Loading from "@/components/Loading/Loading";
+import { useRouter } from "next/navigation";
 
 const VideoDetail = ({ movie }) => {
   // console.log(">>>check movie", movie);
   const [currentMovie, setCurrentMovie] = useState({});
+  const [isRatingInProgress, setIsRatingInProgress] = useState(false);
+
   // console.log(currentMovie.rating, "moi nhat");
   const user = useSelector((state) => state.auth.login.currentUser);
   const username = user?.username;
@@ -19,9 +23,10 @@ const VideoDetail = ({ movie }) => {
   const userId = user?._id;
   const accessToken = user?.accessToken;
   const dispatch = useDispatch();
+  const router = useRouter();
   // let axiosJWT = createAxios(user, null, null);
   console.log(">>> accessToken in Rating <<<", accessToken);
-  let axiosJWT = createAxios(user, dispatch, loginSuccess);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
 
   const moviePhoto = movie && movie?.photo?.[0];
   console.log(moviePhoto);
@@ -41,12 +46,13 @@ const VideoDetail = ({ movie }) => {
     console.log(newRating);
     const base_url = process.env.NEXT_PUBLIC_URL;
     const controller = new AbortController();
-
+    // console.log(!movie && !loadingRating);
     try {
       if (!movie) {
         return;
       }
 
+      setIsRatingInProgress(true);
       const data = {
         name: user?.username,
         point: Number(newRating) * 2,
@@ -70,11 +76,13 @@ const VideoDetail = ({ movie }) => {
       );
       console.log("ratingChanged", response);
       if (response.data.code === 200) {
+        setIsRatingInProgress(false);
         toast.success(response?.data.message);
         setCurrentMovie(response.data.updatedMovie);
       }
     } catch (error) {
       console.log(error);
+      setIsRatingInProgress(false);
       controller.abort();
       toast(error);
     }
@@ -196,23 +204,28 @@ const VideoDetail = ({ movie }) => {
         </div>
         <div className="bg-[#e94a68] py-[9px] px-[15px] mx-[15px] rounded-[4px] text-center">
           <span className="flex justify-center items-center">
-            <ReactStars
-              count={5}
-              half={true}
-              value={
-                currentMovie?.listUserRating != undefined
-                  ? currentMovie.listUserRating?.find(
-                      (item) => item.name == username
-                    )?.point / 2
-                  : movie.listUserRating?.find((item) => item.name == username)
-                      ?.point / 2 || 10
-              }
-              // value={0.5}
-              onChange={ratingChanged}
-              size={24}
-              color2={"#ffd700"}
-              edit={user ? true : false}
-            />
+            {!isRatingInProgress ? (
+              <ReactStars
+                count={5}
+                half={true}
+                value={
+                  currentMovie?.listUserRating != undefined
+                    ? currentMovie.listUserRating?.find(
+                        (item) => item.name == username
+                      )?.point / 2
+                    : movie.listUserRating?.find(
+                        (item) => item.name == username
+                      )?.point / 2 || 10
+                }
+                // value={0.5}
+                onChange={ratingChanged}
+                size={24}
+                color2={"#ffd700"}
+                edit={user ? true : false}
+              />
+            ) : (
+              <Loading />
+            )}
           </span>
 
           <div>

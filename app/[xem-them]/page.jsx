@@ -23,8 +23,9 @@ const MoreFilm = ({ params }) => {
 
   const [arrMovie, setArrMovie] = useState([]);
   const [currentPage, setCurrentPage] = useState(parseInt(pageNumber) || 1);
-  const [pageSize, setPageSize] = useState(3); // lỗi khi back or forward bằng arrow của browser thì kh load lại data, chỉ khi bấm bằng pagination mới load data
+  const [pageSize, setPageSize] = useState(30); // lỗi khi back or forward bằng arrow của browser thì kh load lại data, chỉ khi bấm bằng pagination mới load data
   const [totalPages, setTotalPages] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   // console.log(pageTitle.replace(/-/g, " "));
 
@@ -45,8 +46,10 @@ const MoreFilm = ({ params }) => {
         console.log(">>> getMoreMovies Film <<<", res);
         setArrMovie(res.data.data);
         setTotalPages(Math.ceil(res.data.totalCount / pageSize));
+        setIsLoading(false);
       } catch (err) {
         console.log(err);
+        setIsLoading(false);
       }
     };
     renderMoreMovies();
@@ -89,7 +92,7 @@ const MoreFilm = ({ params }) => {
           styleTitle="text-[#da966e] text-2xl font-normal border-l-4 pl-2.5"
         />
 
-        <LayoutAllFilm arrMovie={arrMovie} />
+        <LayoutAllFilm arrMovie={arrMovie} isLoading={isLoading} />
 
         {arrMovie?.length !== 0 ? (
           <Pagination

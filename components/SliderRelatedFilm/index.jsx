@@ -5,8 +5,13 @@ import Image from "next/legacy/image";
 import MovieRalated from "./components/Movie";
 
 import Heading from "../Heading";
+import ItemMovie from "../ItemMovie";
+import { useSelector } from "react-redux";
+import SkeletonImg from "../SkeletonImg";
 
-const SliderTopRatingofWeek = ({ movies, toast }) => {
+const SliderTopRatingofWeek = ({ toast }) => {
+  const film = useSelector((state) => state.film);
+  const { movies, isFetching } = film;
   // console.log("topRatingofWeek", movies);
 
   return (
@@ -17,11 +22,34 @@ const SliderTopRatingofWeek = ({ movies, toast }) => {
         styleTitle="text-[#da966e] text-2xl font-normal border-l-4 pl-2.5"
       />
 
-      <Slider {...settings}>
+      {isFetching ? (
+        <Slider {...settings}>
+          {Array(5)
+            .fill("")
+            .map((_, index) => (
+              <SkeletonImg key={index} />
+            ))}
+        </Slider>
+      ) : (
+        <Slider {...settings}>
+          {movies?.topRatingofWeek?.map((item, index) => {
+            return (
+              <ItemMovie
+                key={item._id}
+                item={item}
+                toast={toast}
+                isRelatedFilm={true}
+              />
+            );
+          })}
+        </Slider>
+      )}
+
+      {/* <Slider {...settings}>
         {movies?.map((item, index) => {
           return <MovieRalated key={item._id} item={item} toast={toast} />;
         })}
-      </Slider>
+      </Slider> */}
     </div>
   );
 };

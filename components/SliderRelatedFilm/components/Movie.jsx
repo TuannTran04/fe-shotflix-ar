@@ -1,4 +1,3 @@
-import React from "react";
 import Image from "next/legacy/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -39,9 +38,16 @@ const MovieRalated = ({ item, toast }) => {
         toast.warning("Đăng nhập để sử dụng tính năng này");
         return;
       }
-      const res = await addFavoriteMovie(userId, _id);
-      console.log(">>> addFavoriteMovie <<<", res);
-      toast.success(res?.data?.message);
+
+      if (
+        window.confirm(
+          `Bạn có chắc muốn thêm ${title} vào danh sách yêu thích không?`
+        )
+      ) {
+        const res = await addFavoriteMovie(userId, _id);
+        console.log(">>> addFavoriteMovie <<<", res);
+        toast.success(res?.data?.message);
+      }
     } catch (err) {
       console.log(err);
       throw new Error(err);
@@ -56,9 +62,16 @@ const MovieRalated = ({ item, toast }) => {
         toast.warning("Đăng nhập để sử dụng tính năng này");
         return;
       }
-      const res = await addBookmarkMovie(userId, _id);
-      console.log(res);
-      toast.success(res?.data?.message);
+
+      if (
+        window.confirm(
+          `Bạn có chắc muốn thêm ${title} vào danh sách xem sau không?`
+        )
+      ) {
+        const res = await addBookmarkMovie(userId, _id);
+        console.log(res);
+        toast.success(res?.data?.message);
+      }
     } catch (err) {
       console.log(err);
       throw new Error(err);
@@ -66,7 +79,7 @@ const MovieRalated = ({ item, toast }) => {
   };
 
   return (
-    <div key={item.id} className="h-full overflow-hidden">
+    <div className="h-full">
       <div className="relative h-full mx-2 overflow-hidden group">
         <Link
           // href={`/xem-phim/${item.title.replace(/\s+/g, "-")}`}

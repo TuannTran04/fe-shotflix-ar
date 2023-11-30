@@ -1,6 +1,6 @@
 import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
@@ -75,6 +75,9 @@ const CommentUI = ({
   const [showMenuCommentId, setShowMenuCommentId] = useState(null);
   const [showEditingCommentId, setShowEditingCommentId] = useState(null);
   const [showInputReply, setShowInputReply] = useState(null);
+
+  const containerMenu = useRef(null);
+  const btnShowMenuFilm = useRef(null);
 
   const handleChangeInputs = (e) => {
     // console.log([e.target]);
@@ -317,6 +320,25 @@ const CommentUI = ({
     }
   };
 
+  // Sự kiện lắng nghe khi click chuột toàn trang
+  useEffect(() => {
+    const handleClickOutsideHideMenu = (e) => {
+      // Kiểm tra nếu kết quả đang hiển thị và chuột không nằm trong phần tử kết quả
+      if (
+        !containerMenu.current?.contains(e.target) &&
+        e.target != btnShowMenuFilm.current &&
+        !btnShowMenuFilm.current?.contains(e.target)
+      ) {
+        setShowMenuCommentId("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutsideHideMenu);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideHideMenu);
+    };
+  }, []);
+
   return (
     <div
       id={item._id}
@@ -373,6 +395,7 @@ const CommentUI = ({
             <span className="relative flex justify-center text-white">
               <i
                 className="fa-solid fa-ellipsis-vertical px-2 cursor-pointer"
+                ref={btnShowMenuFilm}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -380,7 +403,10 @@ const CommentUI = ({
                 }}
               ></i>
               {item._id === showMenuCommentId && (
-                <span className="py-1 absolute top-0 right-[18px] bg-white min-h-[50px] min-w-[100px] z-40 select-none">
+                <span
+                  className="py-1 absolute top-0 right-[18px] bg-white min-h-[50px] min-w-[100px] z-40 select-none"
+                  ref={containerMenu}
+                >
                   <span
                     className="px-2 flex justify-start items-center hover:bg-[rgba(0,0,0,0.3)] cursor-pointer"
                     onClick={() => handleShowInputEdit(item._id, item.text)}

@@ -21,8 +21,6 @@ export default function Header({ categories }) {
   const id = user?._id;
   const dispatch = useDispatch();
 
-  const resultsRef = useRef(null);
-
   const [arrSearchMovie, setArrSearchMovie] = useState([]);
 
   const [searchInput, setSearchInput] = useState("");
@@ -36,6 +34,7 @@ export default function Header({ categories }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const inputRef = useRef();
+  const resultsRef = useRef(null);
 
   //////////////////////// SEARCH IP DEBOUNCE /////////////////////////////////
   const handleSearchInput = async (e) => {
@@ -72,6 +71,7 @@ export default function Header({ categories }) {
 
   const handleSubmitSearchInputMobile = (e) => {
     e.preventDefault();
+
     if (searchInput) {
       router.push(`/tim-kiem/${searchInput.replace(/\s+/g, "+")}`);
       handleShowSearchInputMobile();
@@ -83,6 +83,7 @@ export default function Header({ categories }) {
   const handleSubmitSearchInput = (e) => {
     e.preventDefault();
     setShowSearchInput((prev) => !prev);
+    inputRef.current.focus();
     if (searchInput) {
       router.push(`/tim-kiem/${searchInput.replace(/\s+/g, "+")}`);
       setSearchInput("");
@@ -111,6 +112,7 @@ export default function Header({ categories }) {
         setShowSearchInputMobile(false); // Ẩn kết quả
 
         setSearchInput("");
+        // console.log("ok");
       } else if (
         !resultsRef.current &&
         e.target !==
@@ -120,6 +122,7 @@ export default function Header({ categories }) {
       ) {
         setShowSearchInput(false); // Ẩn kết quả
         setShowSearchInputMobile(false); // Ẩn kết quả
+        // console.log("ok");
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -456,7 +459,7 @@ export default function Header({ categories }) {
           {/* // SEARCH RESULTS MOBILE? */}
           {searchInput && !isMdScreen && (
             <div
-              // ref={resultsRef}
+              ref={resultsRef}
               className="scroll_search_header min-h-[50px] max-h-[500px] bg-[rgba(0,0,0,.8)] overflow-y-auto "
             >
               {isLoading ? (

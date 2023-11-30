@@ -12,12 +12,15 @@ export const forgotPwdUser = async (
   dispatch,
   toast,
   verifyOTP,
-  setVerifyOTP
+  setVerifyOTP,
+  setIsLoading
 ) => {
   const base_url = process.env.NEXT_PUBLIC_URL;
   dispatch(registerStart());
 
   try {
+    setIsLoading(true);
+
     let response;
     if (!verifyOTP) {
       response = await axios.put(
@@ -27,6 +30,7 @@ export const forgotPwdUser = async (
       console.log(response);
       if (response.status === 200) {
         setVerifyOTP(true);
+        setIsLoading(false);
         toast(response?.data?.message);
       }
     } else {
@@ -38,10 +42,12 @@ export const forgotPwdUser = async (
       const { password, email } = formData;
       dispatch(registerSuccess({ password, email }));
       toast(response?.data?.mes);
+      setIsLoading(false);
       router.push("/dang-nhap");
     }
   } catch (error) {
     console.log(error);
+    setIsLoading(false);
     dispatch(registerFailed());
 
     if (error?.response?.data?.code == 400) {

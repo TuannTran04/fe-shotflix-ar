@@ -1,13 +1,19 @@
 "use client";
-
-import ArrowGotoUp from "@/components/ArrowGoToUp";
-import Footer from "@/components/Footer";
 import LayoutRoot from "@/components/LayoutRoot";
 import MainContentFilm from "@/components/MainContentFilm";
+import SliderTopRatingofWeek from "@/components/SliderRelatedFilm";
 import SliderTrendingFilm from "@/components/SliderTrendFilm";
-import { getFavoriteMovies, getWatchLaterMovies } from "@/store/apiRequest";
+import {
+  getFavoriteAndWatchLaterMovies,
+  getFavoriteMovies,
+  getWatchLaterMovies,
+} from "@/store/apiRequest";
 import { loginSuccess } from "@/store/authSlice";
-import { addDataMovies } from "@/store/filmSlice";
+import {
+  addDataMovies,
+  fetchFilmFailed,
+  fetchFilmStart,
+} from "@/store/filmSlice";
 import { createAxios } from "@/utils/createInstance";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -22,19 +28,26 @@ export default function Dashboard() {
   const user = useSelector((state) => state.auth.login?.currentUser);
   const userId = user?._id;
   const accessToken = user?.accessToken;
-  let axiosJWT = createAxios(user, dispatch, loginSuccess);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
 
   const [categories, setCategories] = useState([]);
-  const [dataMovies, setDataMovies] = useState([]);
+  const [dataMovies, setDataMovies] = useState({});
+  // console.log(dataMovies);
+
+  // const film = useSelector((state) => state.film);
+  // const { watchLaterFilm } = film;
+
+  // console.log(film);
 
   useEffect(() => {
     const fetchData = async () => {
+      dispatch(fetchFilmStart());
       try {
         const moviesResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_URL}/api/v1/movie`
         );
 
-        const dataMovies = moviesResponse?.data?.data || [];
+        const dataMovies = moviesResponse?.data?.data || {};
 
         if (dataMovies) {
           setDataMovies(dataMovies);
@@ -42,41 +55,46 @@ export default function Dashboard() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        dispatch(fetchFilmFailed());
       }
     };
 
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (dataMovies.length > 0) {
-      // console.log("siu");
-      dispatch(addDataMovies(dataMovies));
-    }
-  }, [dataMovies]);
+  // useEffect(() => {
+  //   if (dataMovies.length > 0) {
+  //     // console.log("siu");
+  //     dispatch(addDataMovies(dataMovies));
+  //   }
+  // }, [dataMovies]);
 
   useEffect(() => {
     if (user && accessToken) {
       // console.log("call film");
 
       const controller = new AbortController();
+
       const fetchMovies = async () => {
         try {
-          await Promise.all([
-            getFavoriteMovies(accessToken, dispatch, axiosJWT, controller),
-            getWatchLaterMovies(accessToken, dispatch, axiosJWT, controller),
-          ]);
+          getFavoriteAndWatchLaterMovies(
+            accessToken,
+            dispatch,
+            axiosJWT,
+            controller
+          );
         } catch (err) {
           console.log(err);
         }
       };
+
       fetchMovies();
 
       return () => {
         controller.abort();
       };
     }
-  }, [user, accessToken]);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -107,6 +125,7 @@ export default function Dashboard() {
       <LayoutRoot categories={categories}>
         <SliderTrendingFilm toast={toast} />
         <MainContentFilm toast={toast} />
+        <SliderTopRatingofWeek toast={toast} />
       </LayoutRoot>
 
       <ToastContainer />

@@ -106,7 +106,7 @@ export var settings = {
     {
       breakpoint: 600,
       settings: {
-        slidesToShow: 2,
+        slidesToShow: 3,
         slidesToScroll: 1,
         initialSlide: 2,
         dots: false,
@@ -115,7 +115,7 @@ export var settings = {
     {
       breakpoint: 480,
       settings: {
-        slidesToShow: 3,
+        slidesToShow: 2,
         slidesToScroll: 1,
         dots: false,
       },

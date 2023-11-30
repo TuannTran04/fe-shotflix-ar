@@ -78,25 +78,38 @@ const PlayFilmPage = ({ params }) => {
         toast.warning("Đăng nhập để sử dụng tính năng này");
         return;
       }
+
       if (!checkFavoriteExist) {
-        const res = await addFavoriteMovie(userId, movie._id);
-        console.log(">>> addFavoriteMovie <<<", res);
-        if (res.status === 200 && res?.data.newMovie) {
-          dispatch(addArrFavorite([...favoriteFilm, res.data.newMovie]));
-        }
-        toast.success(res?.data?.message);
-      } else {
-        const res = await deleteFavoriteMovie(userId, movie._id);
-        console.log(">>> deleteFavoriteMovie <<<", res);
-
-        const newArrFavMovie = favoriteFilm.filter(
-          (film) => film._id !== movie._id
-        );
-        console.log("newArrFavMovie", newArrFavMovie);
-
-        if (res.status === 200) {
-          dispatch(addArrFavorite([...newArrFavMovie]));
+        if (
+          window.confirm(
+            `Bạn có chắc muốn thêm ${movie?.title} vào danh sách yêu thích không?`
+          )
+        ) {
+          const res = await addFavoriteMovie(userId, movie._id);
+          console.log(">>> addFavoriteMovie <<<", res);
+          if (res.status === 200 && res?.data.newMovie) {
+            dispatch(addArrFavorite([...favoriteFilm, res.data.newMovie]));
+          }
           toast.success(res?.data?.message);
+        }
+      } else {
+        if (
+          window.confirm(
+            `Bạn có chắc muốn xóa ${movie?.title} khỏi danh sách yêu thích không?`
+          )
+        ) {
+          const res = await deleteFavoriteMovie(userId, movie._id);
+          console.log(">>> deleteFavoriteMovie <<<", res);
+
+          const newArrFavMovie = favoriteFilm.filter(
+            (film) => film._id !== movie._id
+          );
+          console.log("newArrFavMovie", newArrFavMovie);
+
+          if (res.status === 200) {
+            dispatch(addArrFavorite([...newArrFavMovie]));
+            toast.success(res?.data?.message);
+          }
         }
       }
     } catch (err) {
@@ -114,25 +127,37 @@ const PlayFilmPage = ({ params }) => {
         return;
       }
       if (!checkWatchLaterExist) {
-        const res = await addBookmarkMovie(userId, movie._id);
-        console.log(res);
+        if (
+          window.confirm(
+            `Bạn có chắc muốn thêm ${movie?.title} vào danh sách xem sau không?`
+          )
+        ) {
+          const res = await addBookmarkMovie(userId, movie._id);
+          console.log(res);
 
-        if (res.status === 200 && res?.data.newMovie) {
-          dispatch(addArrWatchLater([...watchLaterFilm, res.data.newMovie]));
-        }
-        toast.success(res?.data?.message);
-      } else {
-        const res = await deleteBookmarkMovie(userId, movie._id);
-        console.log(">>> deleteBookMarkMovie <<<", res);
-
-        const newArrBookMarkMovie = watchLaterFilm.filter(
-          (film) => film._id !== movie._id
-        );
-        console.log("newArrBookMarkMovie", newArrBookMarkMovie);
-
-        if (res.status === 200) {
-          dispatch(addArrWatchLater([...newArrBookMarkMovie]));
+          if (res.status === 200 && res?.data.newMovie) {
+            dispatch(addArrWatchLater([...watchLaterFilm, res.data.newMovie]));
+          }
           toast.success(res?.data?.message);
+        }
+      } else {
+        if (
+          window.confirm(
+            `Bạn có chắc muốn xóa ${movie?.title} khỏi danh sách xem sau không?`
+          )
+        ) {
+          const res = await deleteBookmarkMovie(userId, movie._id);
+          console.log(">>> deleteBookMarkMovie <<<", res);
+
+          const newArrBookMarkMovie = watchLaterFilm.filter(
+            (film) => film._id !== movie._id
+          );
+          console.log("newArrBookMarkMovie", newArrBookMarkMovie);
+
+          if (res.status === 200) {
+            dispatch(addArrWatchLater([...newArrBookMarkMovie]));
+            toast.success(res?.data?.message);
+          }
         }
       }
     } catch (err) {
@@ -268,10 +293,7 @@ const PlayFilmPage = ({ params }) => {
             )}
           </div>
 
-          <SliderTopRatingofWeek
-            movies={movies?.topRatingofWeek}
-            toast={toast}
-          />
+          <SliderTopRatingofWeek toast={toast} />
         </div>
       </LayoutRoot>
 
