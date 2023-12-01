@@ -10,6 +10,7 @@ import { loginSuccess } from "../../../../store/authSlice";
 import Image from "next/legacy/image";
 import Loading from "@/components/Loading/Loading";
 import { useRouter } from "next/navigation";
+import SkeletonImg from "@/components/SkeletonImg";
 
 const VideoDetail = ({ movie }) => {
   // console.log(">>>check movie", movie);
@@ -25,11 +26,11 @@ const VideoDetail = ({ movie }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   // let axiosJWT = createAxios(user, null, null);
-  console.log(">>> accessToken in Rating <<<", accessToken);
+  // console.log(">>> accessToken in Rating <<<", accessToken);
   let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
 
   const moviePhoto = movie && movie?.photo?.[0];
-  console.log(moviePhoto);
+  // console.log(moviePhoto);
 
   const category = movie?.category?.map((category) => category.name);
   const arrDetailInfoFilm = [
@@ -127,19 +128,21 @@ const VideoDetail = ({ movie }) => {
     <div className=" py-[10px] rounded-md bg-[#1b2d58]">
       <div className="h-[400px] px-[15px]">
         <span className="relative block w-full h-full">
-          {movie?.photo?.[0] && (
+          {movie?.photo?.[0] ? (
             <Image
               src={movie?.photo?.[0]}
               className="block w-full h-full object-cover"
               // src={`${process.env.NEXT_PUBLIC_URL}/api/v1/movie/poster/${
               //   movie.folderOnFirebase
               // }/${movie.photo?.[0].trim()}`}
-              alt={"pic"}
+              alt="picture detail"
               // width={55}
               // height={55}
               layout="fill"
               // priority
             />
+          ) : (
+            <SkeletonImg height="h-[400px]" />
           )}
         </span>
       </div>

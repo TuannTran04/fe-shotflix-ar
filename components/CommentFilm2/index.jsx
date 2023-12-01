@@ -51,7 +51,7 @@ const CommentFilm = ({ movieId, nameFilm }) => {
   const accessToken = user?.accessToken;
   const refreshToken = Cookie.get("refreshTokenJWT");
 
-  console.log(refreshToken);
+  // console.log(refreshToken);
 
   const [textInputs, setTextInputs] = useState({
     commentInput: "",
@@ -211,13 +211,13 @@ const CommentFilm = ({ movieId, nameFilm }) => {
     const renderComments = async () => {
       try {
         setLoading(true);
-        console.log("siuu");
+        // console.log("siuu");
 
         let comments = await getComment(movieId, page, batchSize);
 
         if (comments.data.code === 200) {
           const newComments = comments.data.data;
-          console.log("newComments", comments);
+          // console.log("newComments", comments);
           setTotalComments(comments.data.count);
 
           if (newComments.length === 0) {

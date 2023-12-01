@@ -38,15 +38,16 @@ const PlayFilmPage = ({ params }) => {
   // const favoriteFilm = user && user.loveMovie;
   // const watchLaterFilm = user && user.markBookMovie;
 
-  let axiosJWT = createAxios(user, dispatch, loginSuccess);
-  console.log(favoriteFilm);
-  console.log(watchLaterFilm);
+  // let axiosJWT = createAxios(user, dispatch, loginSuccess);
+  // console.log(favoriteFilm);
+  // console.log(watchLaterFilm);
 
   // console.log(user);
 
   // console.log(">>> dataMovies <<<", movies?.topRatingofWeek);
 
   const [movie, setMovie] = useState({});
+
   // console.log(movie?._id);
   const [isLgScreen, setIsLgScreen] = useState(false);
 
@@ -67,8 +68,8 @@ const PlayFilmPage = ({ params }) => {
     return isExist;
   }, [watchLaterFilm, movie]);
 
-  console.log(checkFavoriteExist);
-  console.log(checkWatchLaterExist);
+  // console.log(checkFavoriteExist);
+  // console.log(checkWatchLaterExist);
 
   const handleFavorite = async (e) => {
     e.preventDefault();

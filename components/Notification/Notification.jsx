@@ -56,7 +56,7 @@ const Notification = ({}) => {
   const socket = useRef();
   const notifyRef = useRef();
   const containerMenuActionsRef = useRef();
-  console.log(containerMenuActionsRef.current);
+  // console.log(containerMenuActionsRef.current);
 
   const router = useRouter();
   const user = useSelector((state) => state.auth.login.currentUser);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Plyr from "plyr";
 import Hls from "hls.js";
 import videojs from "video.js";
@@ -6,14 +6,15 @@ import videojs from "video.js";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import SkeletonImg from "@/components/SkeletonImg";
 
 let alreadyCalledVideoJs = false;
 // console.log("alreadyCalledVideoJs", alreadyCalledVideoJs);
 
 const VideoContainer = ({ movie, nameFilm }) => {
   const router = useRouter();
-  // console.log(router);
   const refVideo = useRef();
+  // console.log(refVideo.current);
   // let player = useRef(null);
   // const [playerInstance, setPlayerInstance] = useState(null);
   // console.log(">>> player <<<", playerInstance);
@@ -21,11 +22,13 @@ const VideoContainer = ({ movie, nameFilm }) => {
   let player = null;
   let hls = null;
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const user = useSelector((state) => state.auth.login.currentUser);
   const accessToken = user?.accessToken;
   const userId = user?._id;
 
-  console.log(movie.photo?.[0]);
+  // console.log(movie);
 
   var config = {
     autoStartLoad: true,
@@ -220,7 +223,18 @@ const VideoContainer = ({ movie, nameFilm }) => {
                 //   }
                 // });
 
+                // Hide loader when data is loaded
+                player.on("loadeddata", () => {
+                  // loader.style.display = "none";
+                  setIsLoading(false);
+                  console.log("loadeddata");
+                });
+
                 player.on("loadedmetadata", (event) => {
+                  // loader.style.display = "block";
+                  setIsLoading(true);
+                  console.log("loadedmetadata");
+
                   // console.log("readyyyy start");
                   // console.log(event.detail.plyr);
                   // console.log(event.detail.plyr.duration);
@@ -322,21 +336,6 @@ const VideoContainer = ({ movie, nameFilm }) => {
           // true
         ) {
           if (refVideo.current) {
-            // alert("khong sp");
-            // // refVideo.current.src = `/neudanhmatem.mp4`;
-            // // refVideo.current.src = `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/videoHLS/JustaTee/bangkhuang.m3u8`;
-
-            // // refVideo.current.src = `${
-            // //   process.env.NEXT_PUBLIC_URL
-            // // }/api/v1/movie/videoHLS/${
-            // //   movie.folderOnFirebase
-            // // }/${movie.video?.[0].trim()}`;
-            // // refVideo.current.src = `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/videoHLS/chamvaomay_hongson/master.m3u8`;
-            // // refVideo.current.type = "application/x-mpegURL";
-            // // refVideo.current.addEventListener("loadedmetadata", function () {
-            // //   refVideo.current.play();
-            // // });
-
             ////////////////////////////////////////////////////////////
             player = videojs(refVideo.current, {
               html5: {
@@ -510,26 +509,13 @@ const VideoContainer = ({ movie, nameFilm }) => {
   useEffect(() => {
     setupPlyr();
 
-    // Xóa sự kiện và Plyr instance khi unmount
     return () => {
-      // // videojs.getPlayers()["myPlyr"]
-      // if (player && player.isDisposed()) {
-      //   console.log("videojs isDisposed");
-      //   console.log(player);
-      //   console.log(player.isDisposed());
-      //   // videojs.getPlayers()["myPlyr"].dispose();
-      //   player.dispose();
-      //   // refVideo.current = null;
-      //   // window.location.reload();
-      // }
-      ///////
       // if (player && !Hls.isSupported()) {
       //   player.dispose();
       //   window.location.reload();
       // }
       if (player && Hls.isSupported()) {
         player?.destroy();
-        // window.location.reload();
       }
       if (hls && Hls.isSupported()) {
         hls?.destroy();
@@ -537,205 +523,34 @@ const VideoContainer = ({ movie, nameFilm }) => {
     };
   }, [movie, movie._id, nameFilm, refVideo.current]);
 
-  // const tagSources = movie.sources?.map((video, index) => (
-  //   <source
-  //     key={index}
-  //     // src={`${process.env.NEXT_PUBLIC_URL}/api/v1/movie/video/${video.srcVideo}?specificFolder=${movie.folderOnFirebase}`}
-  //     src={`${process.env.NEXT_PUBLIC_URL}/api/v1/movie/videoHLS/JustaTee/bangkhuang.m3u8`}
-  //     type={video.type}
-  //     size={video.sizeVideo}
-  //   />
-  // ));
-  // // console.log(tagSources);
+  let content;
 
-  // const tagTracks = movie.subtitles?.map((subtitle, index) => (
-  //   <track
-  //     key={index}
-  //     kind="captions"
-  //     label={`${subtitle.langSubtitle} captions`}
-  //     src={`${process.env.NEXT_PUBLIC_URL}/api/v1/movie/subtitles/${subtitle.subtitle}?specificFolder=${movie.folderOnFirebase}`}
-  //     srcLang={subtitle.langSubtitle}
-  //     default={index === 0}
-  //   />
-  // ));
-  // console.log(tagTracks);
-
-  return (
+  content = (
     <div className="players-container relative">
-      {movie && (
-        <video
-          // key={movie?._id}
-          className="video-js vjs-default-skin"
-          id="myPlyr"
-          ref={refVideo}
-          crossOrigin="true"
-          playsInline
-          // preload="none"
-          controls
-          style={{ "--plyr-captions-background": "rgba(0, 0, 0, 0.1)" }}
-        >
-          {/* {tagSources} */}
-          {/* {tagTracks} */}
-        </video>
-      )}
+      <video
+        className="video-js vjs-default-skin max-[480px]:h-[300px] min-[480px]:h-[450px] max-[767px]:h-[450px] md:h-[600px] w-full"
+        id="myPlyr"
+        ref={refVideo}
+        crossOrigin="true"
+        playsInline
+        // preload="none"
+        controls
+        style={{ "--plyr-captions-background": "rgba(0, 0, 0, 0.1)" }}
+      ></video>
     </div>
   );
+
+  // useEffect(() => {
+  //   if (!refVideo.current) {
+  //     content = (
+  //       <div className="players-container relative">
+  //         <SkeletonImg />
+  //       </div>
+  //     );
+  //   }
+  // }, [refVideo.current]);
+
+  return content;
 };
 
 export default VideoContainer;
-
-// const plyrTracks = movie.subtitles?.map((subtitle, index) => ({
-//   kind: "captions",
-//   label: `${subtitle.langSubtitle} captions`,
-//   srcLang: subtitle.langSubtitle,
-//   src: `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/subtitles/${subtitle.subtitle}?specificFolder=${movie.folderOnFirebase}`,
-//   // src: `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/subtitles/test_vtt.m3u8?specificFolder=${movie.folderOnFirebase}`,
-//   default: index === 0, // Đánh dấu phụ đề đầu tiên là mặc định
-// }));
-// // console.log("plyrTracks", plyrTracks);
-
-// const plyrSources = movie.sources?.map((video, index) => ({
-//   // src: `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/video/${video.srcVideo}?specificFolder=${movie.folderOnFirebase}`,
-//   // src: `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/videoHLS/test_hls/v240p/index.m3u8`,
-
-//   src: `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/videoHLS/${
-//     movie.folderOnFirebase
-//   }/${movie.video?.[0].trim()}`,
-//   // src: `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/videoHLS/HoangDung/nangtho.mp4`,
-
-//   // type: video.typeVideo,
-//   // type: "application/x-mpegURL",
-//   type: "application/x-mpegurl",
-
-//   // size: video.sizeVideo,
-// }));
-
-// // Initialize PLYR here
-// player = new Plyr(refVideo.current, {
-//   title: "Example Title",
-//   controls: [
-//     "play-large",
-//     // "restart",
-//     "rewind",
-//     "play",
-//     "fast-forward",
-//     "progress",
-//     "current-time",
-//     "duration",
-//     "mute",
-//     "volume",
-//     "captions",
-//     "settings",
-//     "pip",
-//     "airplay",
-//     "fullscreen",
-//   ],
-//   settings: ["captions", "quality", "speed", "loop"],
-//   // captions: { active: true, language: "vi", update: true },
-//   tooltips: { controls: true, seek: true },
-//   keyboard: { focused: true, global: true },
-//   markers: {
-//     enabled: true,
-//     points: [{ time: 50, label: "con cec" }],
-//   },
-//   fullscreen: {
-//     enabled: true,
-//     fallback: true,
-//     iosNative: true,
-//     container: null,
-//   },
-//   disableContextMenu: false,
-//   playsinline: true,
-//   enabled: true,
-//   ...defaultOptions,
-//   // debug: true,
-// });
-
-// /////////////////////////////
-// // // Thiết lập tracks cho Plyr
-// player.source = {
-//   type: "video",
-//   title: "Example title",
-//   sources: plyrSources,
-//   tracks: plyrTracks,
-// };
-// /////////////////////////////
-
-// // Đặt sự kiện cho Plyr khi video load xong các data
-// if (player.playing == false) {
-//   player.on("loadedmetadata", (event) => {
-//     // console.log("readyyyy start");
-//     // console.log(event.detail.plyr);
-//     // console.log(event.detail.plyr.duration);
-//     // Kiểm tra nếu có trạng thái xem video trong Local Storage
-//     // const savedPlaybackTime = JSON.parse(
-//     //   decryptData(localStorage.getItem(`${movie?._id}`), secretKey)
-//     // );
-
-//     const savedPlaybackTime = JSON.parse(
-//       localStorage.getItem(`${movie?._id}`)
-//     );
-//     // console.log(savedPlaybackTime);
-//     const currTimeLocal = savedPlaybackTime?.currentTime;
-//     const videoIdLocal = savedPlaybackTime?.videoId;
-
-//     if (videoIdLocal == movie._id && event.detail.plyr.duration) {
-//       console.log("savedPlaybackTime canplay");
-
-//       const setPlayerCurrentTime = (currentTime) => {
-//         setTimeout(() => {
-//           const minutes = Math.floor(currentTime / 60);
-//           const seconds = Math.round(currentTime % 60);
-//           if (true) {
-//             // console.log(player.current);
-//             // console.log("continue");
-//             event.detail.plyr.muted = false;
-//             event.detail.plyr.currentTime = currentTime;
-//             // player.play();
-//           } else {
-//             console.log("begin");
-//             player.muted = true;
-//             player.currentTime = 0;
-//             player.play();
-//           }
-//         }, 500);
-//       };
-//       setPlayerCurrentTime(currTimeLocal);
-//     }
-//   });
-// }
-
-// // Đặt sự kiện cho Plyr khi video được update time
-// player.on("timeupdate", (event) => {
-//   // console.log("Video is timeupdate");
-//   let currentTime = event.detail.plyr.currentTime;
-//   const duration = event.detail.plyr.duration;
-
-//   // Thời gian hiện tại gần cuối video (1 giây trước khi kết thúc)
-//   if (duration && duration - currentTime < 1) {
-//     // console.log("Video đã xem xong");
-//     // Thực hiện các tác vụ khi video kết thúc hoặc đã xem xong
-//     localStorage.removeItem(`${movie?._id}`);
-//   }
-
-//   // currTime > 0 và khi video chưa kết thúc thì set localStorage time update
-//   if (
-//     currentTime &&
-//     currentTime > 0 &&
-//     duration &&
-//     duration - currentTime > 1
-//   ) {
-//     // console.log("sett", {
-//     //   currentTime: currentTime,
-//     //   videoId: movie._id,
-//     // });
-
-//     localStorage.setItem(
-//       `${movie?._id}`,
-//       JSON.stringify({
-//         currentTime: currentTime,
-//         videoId: movie._id,
-//       })
-//     );
-//   }
-// });
