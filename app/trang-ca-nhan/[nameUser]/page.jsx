@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import Image from "next/legacy/image";
 import LayoutRoot from "@/components/LayoutRoot";
 import axios from "axios";
+import withAuth from "@/utils/withAuth";
 
 const arrTabs = [
   { id: 1, tabName: "Hồ sơ", tabPath: "profile" },
@@ -71,117 +72,117 @@ const UserManagePage = ({ params }) => {
   }, []);
 
   return (
-    <ProtectedRoute>
-      <LayoutRoot categories={categories}>
-        <div className="sm:mt-2 mb-8 overflow-hidden">
-          <div className="flex justify-start items-center mb-[25px]">
-            <div className="relative h-[150px] w-[150px] select-none">
-              <Image
-                src={user?.avatar || "/unknowAvatar.webp"}
-                className="nameUser-image-border block w-full h-full rounded-[50%] object-cover hover:!border-[1px] transition-all duration-100 cursor-pointer"
-                alt="pic"
-                layout="fill"
-                priority
-                onClick={() => {
-                  setShowBigAvatar(true);
-                }}
-              />
-            </div>
-
-            {/* big overlay img */}
-            {showBigAvatar && (
-              <>
-                <div
-                  className="fixed inset-x-0 inset-y-0 bg-[rgba(0,0,0,0.7)] z-[150] cursor-pointer"
-                  onClick={() => {
-                    setShowBigAvatar(false);
-                  }}
-                ></div>
-
-                <div className="fixed top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-[200]">
-                  <div className="relative w-[400px] h-[500px] sm:w-[500px] sm:h-[500px]  select-none z-[200]">
-                    <Image
-                      src={user?.avatar || "/unknowAvatar.webp"}
-                      className="block flex-1 w-full object-cover z-[200]"
-                      alt="big pic"
-                      layout="fill"
-                      priority
-                    />
-                    <i
-                      className="fa-solid fa-xmark absolute top-1 right-1 w-[30px] h-[30px] bg-white opacity-60 rounded-[50%] z-[250] cursor-pointer hover:opacity-100
-                      before:flex before:h-full before:justify-center before:items-center 
-                      "
-                      onClick={() => {
-                        setShowBigAvatar(false);
-                      }}
-                    ></i>
-                  </div>
-                </div>
-              </>
-            )}
-
-            <div className="ml-[15px]">
-              <div className="mb-[10px] max-w-[300px]">
-                <h1 className="w-full text-xl font-semibold text-white whitespace-nowrap text-ellipsis overflow-hidden">
-                  {user?.username || nameUser}
-                </h1>
-              </div>
-              <div>
-                <Link
-                  className="py-[6px] px-[10px] bg-[#567] text-[#c8d4e0] text-sm font-normal tracking-[.075em] rounded-[3px] shadow cursor-pointer select-none hover:bg-[#678] hover:text-white"
-                  href={`/chinh-sua-thong-tin/${user?.username || nameUser}`}
-                >
-                  Chỉnh sửa hồ sơ
-                </Link>
-              </div>
-            </div>
+    // <ProtectedRoute>
+    <LayoutRoot categories={categories}>
+      <div className="sm:mt-2 mb-8 overflow-hidden">
+        <div className="flex justify-start items-center mb-[25px]">
+          <div className="relative h-[150px] w-[150px] select-none">
+            <Image
+              src={user?.avatar || "/unknowAvatar.webp"}
+              className="nameUser-image-border block w-full h-full rounded-[50%] object-cover hover:!border-[1px] transition-all duration-100 cursor-pointer"
+              alt="pic"
+              layout="fill"
+              priority
+              onClick={() => {
+                setShowBigAvatar(true);
+              }}
+            />
           </div>
 
-          {/* TABs */}
-          <nav className="block border-[1px] border-[#24303c] rounded-[3px]">
-            <ul className="scroll_tab_manage_user flex flex-nowrap mx-auto items-center overflow-x-auto">
-              {arrTabs.map((item, index) => (
-                <li key={item.id} className="mx-auto">
-                  <Link
-                    href="#"
-                    className={`block p-[12px] text-base text-white underline-offset-8 hover:underline ${
-                      activeTab == item.tabPath ? "underline" : ""
-                    }`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setActiveTab(item.tabPath);
-                      handleNavigate(item.tabPath);
+          {/* big overlay img */}
+          {showBigAvatar && (
+            <>
+              <div
+                className="fixed inset-x-0 inset-y-0 bg-[rgba(0,0,0,0.7)] z-[150] cursor-pointer"
+                onClick={() => {
+                  setShowBigAvatar(false);
+                }}
+              ></div>
+
+              <div className="fixed top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-[200]">
+                <div className="relative w-[400px] h-[500px] sm:w-[500px] sm:h-[500px]  select-none z-[200]">
+                  <Image
+                    src={user?.avatar || "/unknowAvatar.webp"}
+                    className="block flex-1 w-full object-cover z-[200]"
+                    alt="big pic"
+                    layout="fill"
+                    priority
+                  />
+                  <i
+                    className="fa-solid fa-xmark absolute top-1 right-1 w-[30px] h-[30px] bg-white opacity-60 rounded-[50%] z-[250] cursor-pointer hover:opacity-100
+                      before:flex before:h-full before:justify-center before:items-center 
+                      "
+                    onClick={() => {
+                      setShowBigAvatar(false);
                     }}
-                  >
-                    {item.tabName}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+                  ></i>
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="ml-[15px]">
+            <div className="mb-[10px] max-w-[300px]">
+              <h1 className="w-full text-xl font-semibold text-white whitespace-nowrap text-ellipsis overflow-hidden">
+                {user?.username || nameUser}
+              </h1>
+            </div>
+            <div>
+              <Link
+                className="py-[6px] px-[10px] bg-[#567] text-[#c8d4e0] text-sm font-normal tracking-[.075em] rounded-[3px] shadow cursor-pointer select-none hover:bg-[#678] hover:text-white"
+                href={`/chinh-sua-thong-tin/${user?.username || nameUser}`}
+              >
+                Chỉnh sửa hồ sơ
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {searchParams.get("tab") && searchParams.get("tab") == "profile" ? (
-          <ProfileUser userData={user} />
-        ) : (
-          ""
-        )}
+        {/* TABs */}
+        <nav className="block border-[1px] border-[#24303c] rounded-[3px]">
+          <ul className="scroll_tab_manage_user flex flex-nowrap mx-auto items-center overflow-x-auto">
+            {arrTabs.map((item, index) => (
+              <li key={item.id} className="mx-auto">
+                <Link
+                  href="#"
+                  className={`block p-[12px] text-base text-white underline-offset-8 hover:underline ${
+                    activeTab == item.tabPath ? "underline" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveTab(item.tabPath);
+                    handleNavigate(item.tabPath);
+                  }}
+                >
+                  {item.tabName}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
 
-        {/* FILMs */}
+      {searchParams.get("tab") && searchParams.get("tab") == "profile" ? (
+        <ProfileUser userData={user} />
+      ) : (
+        ""
+      )}
 
-        {searchParams.get("tab") && searchParams.get("tab") == "favorite" && (
-          <FavoriteMovie />
-        )}
-        {searchParams.get("tab") && searchParams.get("tab") == "watchLater" && (
-          <WatchLaterMovie />
-        )}
-      </LayoutRoot>
-    </ProtectedRoute>
+      {/* FILMs */}
+
+      {searchParams.get("tab") && searchParams.get("tab") == "favorite" && (
+        <FavoriteMovie />
+      )}
+      {searchParams.get("tab") && searchParams.get("tab") == "watchLater" && (
+        <WatchLaterMovie />
+      )}
+    </LayoutRoot>
+    // </ProtectedRoute>
   );
 };
 
-export default UserManagePage;
+export default withAuth(UserManagePage);
 
 // export async function getServerSideProps({ params }) {
 //   const nameUser = params.nameUser;

@@ -164,13 +164,11 @@ export default function Header({ categories }) {
           </div>
 
           {/* NAV MOBILE */}
-          {!isMdScreen && (
-            <SidebarHomeMobile
-              categories={categories}
-              showSideBarMobile={showSideBarMobile}
-              setShowSideBarMobile={setShowSideBarMobile}
-            />
-          )}
+          <SidebarHomeMobile
+            categories={categories}
+            showSideBarMobile={showSideBarMobile}
+            setShowSideBarMobile={setShowSideBarMobile}
+          />
 
           <div className="flex justify-center items-center bg-[#000543] px-[15px] w-[180px] h-full text-center">
             <Link href="/" className="relative inline-block w-full h-full">
@@ -292,7 +290,7 @@ export default function Header({ categories }) {
                 </div>
 
                 {/* NOTFICATION  */}
-                <Notification />
+                {isMdScreen && <Notification />}
               </div>
 
               {/* // SEARCH RESULTS LAPTOP? */}

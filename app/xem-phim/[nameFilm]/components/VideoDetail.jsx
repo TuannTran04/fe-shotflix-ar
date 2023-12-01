@@ -142,7 +142,7 @@ const VideoDetail = ({ movie }) => {
               // priority
             />
           ) : (
-            <SkeletonImg height="h-[400px]" />
+            <SkeletonImg height="h-[400px]" isVideoDetail={true} />
           )}
         </span>
       </div>

@@ -3,11 +3,16 @@ const SkeletonImg = ({
   width,
   height = "h-[340px]",
   isSidebarContent,
+  isVideoDetail,
 }) => {
   let content;
 
   content = (
-    <div className={`flex justify-center items-center ${height} mx-2.5`}>
+    <div
+      className={`flex justify-center items-center ${height}  ${
+        isVideoDetail ? "" : "mx-2.5"
+      }`}
+    >
       {Array(rows)
         .fill("")
         .map((_, index) => (

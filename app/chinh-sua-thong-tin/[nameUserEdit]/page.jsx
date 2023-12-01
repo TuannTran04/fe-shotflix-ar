@@ -16,6 +16,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LayoutRoot from "@/components/LayoutRoot";
 import axios from "axios";
+import withAuth from "@/utils/withAuth";
 
 const EditInfoUser = ({ params }) => {
   const nameUserEdit = params.nameUserEdit;
@@ -98,7 +99,8 @@ const EditInfoUser = ({ params }) => {
   }, []);
 
   return (
-    <ProtectedRoute>
+    // <ProtectedRoute>
+    <>
       <LayoutRoot categories={categories}>
         <div className="sm:mt-2 mb-8 min-h-[400px] overflow-hidden">
           <div className="flex justify-start items-center mb-[25px]">
@@ -242,11 +244,12 @@ const EditInfoUser = ({ params }) => {
         </div>
       </LayoutRoot>
       <ToastContainer />
-    </ProtectedRoute>
+    </>
+    // </ProtectedRoute>
   );
 };
 
-export default EditInfoUser;
+export default withAuth(EditInfoUser);
 
 // export async function getServerSideProps(context) {
 //   // console.log(Cookies.parse(context.req.headers.cookie));

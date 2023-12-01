@@ -52,8 +52,8 @@ function timeAgo(createdAt) {
   return `${months} tháng trước`;
 }
 
-const Notification = ({}) => {
-  const socket = useRef();
+const Notification = ({ test }) => {
+  // const socket = useRef();
   const notifyRef = useRef();
   const containerMenuActionsRef = useRef();
   // console.log(containerMenuActionsRef.current);
@@ -65,7 +65,7 @@ const Notification = ({}) => {
   // const dispatch = useDispatch();
 
   const [listNoti, setListNoti] = useState([]);
-  const [totalUnread, setTotalUnread] = useState(0);
+  // const [totalUnread, setTotalUnread] = useState(0);
   const [totalUnseen, setTotalUnseen] = useState(0);
   const [totalNotify, setTotalNotify] = useState(0);
   // console.log("notify unread >", totalUnread, "notify total >", totalNotify);
@@ -238,6 +238,7 @@ const Notification = ({}) => {
       };
     }
   }, [notifyRef.current, handleScroll]);
+  /////////////////////////////////////////////////////////////////////
 
   // handle render notifications
   const fetchData = async (pageNumber) => {
@@ -305,9 +306,9 @@ const Notification = ({}) => {
     const fetchUnreadNotifyCount = async () => {
       try {
         const response = await getUnreadNotifyCount(id); // Thay thế bằng cuộc gọi API thích hợp
-        // console.log(response);
+        console.log(response);
         if (response?.data?.code === 200) {
-          setTotalUnread(response.data.data.unreadNotifyCount);
+          // setTotalUnread(response.data.data.unreadNotifyCount);
           setTotalUnseen(response.data.data.unseenNotifyCount);
           setTotalNotify(response.data.data.totalCount);
         }
@@ -319,7 +320,8 @@ const Notification = ({}) => {
     if (user && id) {
       fetchUnreadNotifyCount();
     }
-  }, [listNoti]);
+  }, []);
+  // listNoti
 
   return (
     <>
@@ -344,7 +346,7 @@ const Notification = ({}) => {
             <i className="fa-regular fa-bell"></i>
           </button>
           {showNotification && (
-            <div className="notification_container absolute top-[130%] right-[-19%] md:top-[110%] md:right-[30%] min-h-[50px] w-screen md:w-[450px] bg-[rgba(0,0,0,.8)] border-2 border-gray-700">
+            <div className="notification_container absolute top-[130%] md:top-[110%] md:right-[30%] min-h-[50px] w-[100%] md:w-[450px] bg-[rgba(0,0,0,.8)] border-2 border-gray-700">
               <div className="px-4 py-2 border-b-[1px] border-gray-400">
                 <h2 className="text-base font-semibold text-white">
                   Thông báo ({totalNotify})
@@ -407,7 +409,7 @@ const Notification = ({}) => {
                           </p>
                         </span>
 
-                        <span className="relative w-[100px] h-[50px] ml-[10px] overflow-hidden">
+                        <span className="hidden md:block relative w-[100px] h-[50px] ml-[10px] overflow-hidden">
                           <Image
                             src={item?.movie?.photo?.[0]}
                             // src="https://yt3.ggpht.com/oEiclGnYQdKhndmRnTOI-V0qU0pwoijkwSs-dLgTGAzr9zcS6NGS-H3ryfRjhgs3LTZwkLjHyA=s300-c-k-c0x00ffffff-no-rj"
