@@ -47,7 +47,7 @@ const UserManagePage = ({ params }) => {
 
   useEffect(() => {
     router.push(
-      `/trang-ca-nhan/${nameUser.replace(/\s+/g, "-")}?tab=${activeTab}`
+      `/trang-ca-nhan/${nameUser?.replace(/\s+/g, "-")}?tab=${activeTab}`
     );
   }, []);
 

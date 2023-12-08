@@ -207,8 +207,8 @@ body {
 }
 .sidebarMobile .side-navigation-panel-select-option {
   border: none !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
 }
 .sidebarMobile .side-navigation-panel-select-option:hover {
   /* background-color: white !important; */

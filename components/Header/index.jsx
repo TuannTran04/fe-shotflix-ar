@@ -379,8 +379,8 @@ export default function Header({ categories }) {
                   <div className="col-span-4">
                     <Link
                       href={`/trang-ca-nhan/${user?.username
-                        .replace(/\s+/g, "")
-                        .toLowerCase()}`}
+                        ?.replace(/\s+/g, "")
+                        ?.toLowerCase()}`}
                       className="text-black font-bold whitespace-nowrap text-ellipsis overflow-hidden"
                       title={user?.username}
                     >
@@ -392,7 +392,7 @@ export default function Header({ categories }) {
                     <span className="flex items-center text-xs mt-[2px] col-span-1">
                       <i className="fa-solid fa-coins text-yellow-400 mr-[4px]"></i>
                       <p className="text-[#2DAAED] flex-1 font-semibold whitespace-nowrap text-ellipsis overflow-hidden">
-                        12000
+                        0
                       </p>
                     </span>
                   </div>
@@ -406,8 +406,8 @@ export default function Header({ categories }) {
                   <li className="block hover:bg-gray-100">
                     <Link
                       href={`/trang-ca-nhan/${user?.username
-                        .replace(/\s+/g, "-")
-                        .toLowerCase()}`}
+                        ?.replace(/\s+/g, "-")
+                        ?.toLowerCase()}`}
                       className="py-2.5 px-3.5 block w-full text-sm"
                     >
                       Trang cá nhân

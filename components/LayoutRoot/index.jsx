@@ -1,5 +1,5 @@
 // import { Inter } from "next/font/google";
-
+"use client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArrowGotoUp from "../ArrowGoToUp";

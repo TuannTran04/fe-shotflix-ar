@@ -9,7 +9,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { updateInfoUser } from "../../../store/apiRequest";
 import { createAxios } from "../../../utils/createInstance";
-import ProtectedRoute from "../../../utils/ProtectedRoutes";
 import { loginSuccess } from "../../../store/authSlice";
 import Image from "next/legacy/image";
 import { ToastContainer, toast } from "react-toastify";
@@ -21,7 +20,12 @@ import withAuth from "@/utils/withAuth";
 const EditInfoUser = ({ params }) => {
   const nameUserEdit = params.nameUserEdit;
   const schema = yup.object().shape({
-    username: yup.string().min(6).max(20).required(),
+    username: yup
+      .string()
+      .min(6)
+      .max(20)
+      .matches(/^\S*$/, "Username cannot contain spaces")
+      .required(),
     email: yup.string().email("Invalid email format").required(),
   });
 
@@ -51,9 +55,25 @@ const EditInfoUser = ({ params }) => {
   const onSubmit = async (data) => {
     const controller = new AbortController();
 
-    console.log(">>> Data EDIT <<<", data);
+    // console.log(">>> Data EDIT <<<", data);
+
+    const newData = { ...data, avatar2: data?.avatar2?.[0] };
+
+    const formData = new FormData();
+    Object.entries(newData).forEach(([key, value]) => {
+      if (value !== null) {
+        if (key === "avatar2") {
+          formData.append(key, value);
+        } else {
+          formData.append(key, value.toString());
+        }
+      }
+    });
+
+    console.log(...formData.entries());
+
     const response = await updateInfoUser(
-      data,
+      formData,
       accessToken,
       controller,
       dispatch,
@@ -218,6 +238,19 @@ const EditInfoUser = ({ params }) => {
                     type="text"
                     placeholder="link ảnh bất kỳ"
                     {...register("avatar", { required: false })}
+                  />
+                </div>
+
+                <div className="mb-[20px]">
+                  <label className="block mb-[5px] text-base text-white">
+                    Ảnh đại diện 2 (File)
+                  </label>
+                  <input
+                    className="block p-[9px] w-full text-[#89a] bg-[#2c3440] shadow-md outline-none rounded focus:bg-white focus:text-black"
+                    name="avatar2"
+                    type="file"
+                    placeholder="link ảnh bất kỳ"
+                    {...register("avatar2", { required: false })}
                   />
                 </div>
 

@@ -1,7 +1,6 @@
 import Slider from "react-slick";
 
 import { settings } from "./constants";
-import Movie from "./components/Movie";
 
 import { useSelector } from "react-redux";
 
@@ -52,12 +51,6 @@ const SliderTrendingFilm = ({ toast }) => {
           })}
         </Slider>
       )}
-
-      {/* <Slider {...settings}>
-        {movies?.trending?.map((item, index) => {
-          return <Movie key={item._id} item={item} toast={toast} />;
-        })}
-      </Slider> */}
     </div>
   );
 };

@@ -238,21 +238,19 @@ const VideoContainer = ({ movie, nameFilm }) => {
 
   return (
     <div className="players-container relative">
-      {movie && (
-        <video
-          // key={movie?._id}
-          id="myPlyr"
-          ref={refVideo}
-          crossOrigin="true"
-          playsInline
-          preload="auto"
-          controls
-          style={{ "--plyr-captions-background": "rgba(0, 0, 0, 0.1)" }}
-        >
-          {/* {tagSources}
+      <video
+        // key={movie?._id}
+        id="myPlyr"
+        ref={refVideo}
+        crossOrigin="true"
+        playsInline
+        preload="auto"
+        controls
+        style={{ "--plyr-captions-background": "rgba(0, 0, 0, 0.1)" }}
+      >
+        {/* {tagSources}
           {tagTracks} */}
-        </video>
-      )}
+      </video>
     </div>
   );
 };

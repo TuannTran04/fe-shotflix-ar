@@ -3,11 +3,7 @@ import LayoutRoot from "@/components/LayoutRoot";
 import MainContentFilm from "@/components/MainContentFilm";
 import SliderTopRatingofWeek from "@/components/SliderRelatedFilm";
 import SliderTrendingFilm from "@/components/SliderTrendFilm";
-import {
-  getFavoriteAndWatchLaterMovies,
-  getFavoriteMovies,
-  getWatchLaterMovies,
-} from "@/store/apiRequest";
+import { getFavoriteAndWatchLaterMovies } from "@/store/apiRequest";
 import { loginSuccess } from "@/store/authSlice";
 import {
   addDataMovies,
@@ -31,7 +27,7 @@ export default function Dashboard() {
   let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
 
   const [categories, setCategories] = useState([]);
-  const [dataMovies, setDataMovies] = useState({});
+  // const [dataMovies, setDataMovies] = useState({});
   // console.log(dataMovies);
 
   // const film = useSelector((state) => state.film);
@@ -50,7 +46,7 @@ export default function Dashboard() {
         const dataMovies = moviesResponse?.data?.data || {};
 
         if (dataMovies) {
-          setDataMovies(dataMovies);
+          // setDataMovies(dataMovies);
           dispatch(addDataMovies(dataMovies));
         }
       } catch (error) {
@@ -118,10 +114,6 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* <div className="bg-[#424040]">
-        <div className="w-full md:max-w-[1200px] mx-auto bg-[#151414] p-3 sm:p-7"></div>
-      </div> */}
-
       <LayoutRoot categories={categories}>
         <SliderTrendingFilm toast={toast} />
         <MainContentFilm toast={toast} />
@@ -132,33 +124,3 @@ export default function Dashboard() {
     </>
   );
 }
-
-// export async function generateStaticParams() {
-//   try {
-//     const [moviesResponse, categoriesResponse] = await Promise.all([
-//       axios.get(`${process.env.NEXT_PUBLIC_URL}/api/v1/movie`),
-//       axios.get(`${process.env.NEXT_PUBLIC_URL}/api/v1/category`),
-//     ]);
-
-//     const dataMovies = moviesResponse?.data?.data || [];
-//     const categories = categoriesResponse?.data?.data || [];
-
-//     return {
-//       props: {
-//         dataMovies,
-//         categories,
-//       },
-//       revalidate: 60, // Revalidate every 60 seconds (adjust as needed)
-//     };
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-
-//     return {
-//       props: {
-//         dataMovies: [],
-//         categories: [],
-//       },
-//       revalidate: 60, // Revalidate every 60 seconds (adjust as needed)
-//     };
-//   }
-// }

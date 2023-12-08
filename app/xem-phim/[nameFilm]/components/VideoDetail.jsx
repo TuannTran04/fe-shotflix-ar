@@ -1,3 +1,4 @@
+"use client";
 // import axios from "axios";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -139,7 +140,7 @@ const VideoDetail = ({ movie }) => {
               // width={55}
               // height={55}
               layout="fill"
-              // priority
+              priority
             />
           ) : (
             <SkeletonImg height="h-[400px]" isVideoDetail={true} />

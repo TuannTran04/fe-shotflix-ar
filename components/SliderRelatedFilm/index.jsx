@@ -1,9 +1,6 @@
+"use client";
 import Slider from "react-slick";
-
 import { settings } from "./constant";
-import Image from "next/legacy/image";
-import MovieRalated from "./components/Movie";
-
 import Heading from "../Heading";
 import ItemMovie from "../ItemMovie";
 import { useSelector } from "react-redux";
@@ -44,12 +41,6 @@ const SliderTopRatingofWeek = ({ toast }) => {
           })}
         </Slider>
       )}
-
-      {/* <Slider {...settings}>
-        {movies?.map((item, index) => {
-          return <MovieRalated key={item._id} item={item} toast={toast} />;
-        })}
-      </Slider> */}
     </div>
   );
 };

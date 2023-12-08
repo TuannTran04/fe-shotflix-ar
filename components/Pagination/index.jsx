@@ -1,5 +1,8 @@
+"use client";
 export default function Pagination({ paginationData, visiblePage = 4 }) {
   const { currentPage, totalPages, setCurrentPage } = paginationData;
+
+  console.log(currentPage, totalPages);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

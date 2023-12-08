@@ -116,9 +116,19 @@ const LoginPage = () => {
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Đăng nhập tài khoản
-            </h1>
+            <div className="flex justify-between items-center">
+              <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                Đăng nhập tài khoản
+              </h1>
+              <Link
+                href="/"
+                title="Trang chủ"
+                className="bg-black p-2 rounded cursor-pointer hover:opacity-60"
+              >
+                <i className="fa-solid fa-house text-white"></i>
+              </Link>
+            </div>
+
             <form
               className="space-y-4 md:space-y-6"
               onSubmit={handleSubmit(onSubmit)}

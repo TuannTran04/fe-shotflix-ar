@@ -13,6 +13,7 @@ import { useSearchParams } from "next/navigation";
 
 const MoreFilm = ({ params }) => {
   const nameMoreFilm = decodeURIComponent(params["xem-them"]);
+  console.log(nameMoreFilm);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,11 +38,7 @@ const MoreFilm = ({ params }) => {
   useEffect(() => {
     const renderMoreMovies = async () => {
       try {
-        const res = await getMoreMovies(
-          nameMoreFilm.replace(/-/g, " "),
-          currentPage,
-          pageSize
-        );
+        const res = await getMoreMovies(nameMoreFilm, currentPage, pageSize);
 
         console.log(">>> getMoreMovies Film <<<", res);
         setArrMovie(res.data.data);
@@ -84,10 +81,10 @@ const MoreFilm = ({ params }) => {
   return (
     <LayoutRoot categories={categories}>
       <div className="sm:mt-2">
-        <Breadcrumb content={pageTitle.replace(/-/g, " ")} />
+        <Breadcrumb content={pageTitle?.replace(/-/g, " ")} />
 
         <Heading
-          content={pageTitle.replace(/-/g, " ")}
+          content={pageTitle?.replace(/-/g, " ")}
           styleDiv="mb-4"
           styleTitle="text-[#da966e] text-2xl font-normal border-l-4 pl-2.5"
         />
@@ -111,17 +108,3 @@ const MoreFilm = ({ params }) => {
 };
 
 export default MoreFilm;
-
-// export async function getServerSideProps(context) {
-//   const nameMoreFilm = context.params.moreFilm;
-
-//   let allCategory = await axios.get(
-//     `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
-//   );
-//   return {
-//     props: {
-//       nameMoreFilm,
-//       categories: allCategory.data.data,
-//     },
-//   };
-// }

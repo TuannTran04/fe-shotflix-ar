@@ -159,7 +159,10 @@ export const updateInfoUser = async (
       `${base_url}/api/v1/user/update-info-user`,
       formData,
       {
-        headers: { token: `Bearer ${token}` },
+        headers: {
+          token: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
         signal: controller.signal,
       }
     );

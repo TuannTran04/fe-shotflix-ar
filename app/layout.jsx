@@ -69,10 +69,11 @@ export async function generateMetadata({}) {
       };
     }
 
-    console.log("res meta", infoShotflix);
+    // console.log("res meta", infoShotflix);
 
     return {
-      metadataBase: new URL("http://localhost:3001"),
+      // metadataBase: new URL("http://localhost:3001"),
+      metadataBase: new URL("https://shotflix.vn"),
 
       title: {
         default: infoShotflix?.title ? infoShotflix?.title : "Shotflix",
@@ -129,12 +130,13 @@ const jsonLD = {
   // ],
   image: {
     "@type": "ImageObject",
-    url: "https://salt.tikicdn.com/cache/w500/ts/upload/c0/8b/46/c3f0dc850dd93bfa7af7ada0cbd75dc0.png",
+    url: "https://firebasestorage.googleapis.com/v0/b/prj-cv-film.appspot.com/o/images_seo_shotflix%2Flogo_shotflix.png?alt=media&token=552dbdfc-2dde-4376-bc44-500179bc9f63",
     width: 1080,
     height: 1080,
   },
   telephone: "19006035",
-  url: "http://localhost:3001",
+  // url: "http://localhost:3001",
+  url: "https://shotflix.vn",
   address: {
     "@type": "PostalAddress",
     streetAddress: "52 Ut Tich, Ward 4, Tan Binh District, Ho Chi Minh City",
@@ -201,8 +203,8 @@ export default function RootLayout({ children }) {
         </ErrorBoundary>
 
         <Script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.0/flowbite.min.js" />
-        <Script src="https://cdn.jsdelivr.net/npm/hls.js@latest" />
-        <Script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js" />
+        {/* <Script src="https://cdn.jsdelivr.net/npm/hls.js@latest" />
+        <Script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js" /> */}
         <Script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLD) }}

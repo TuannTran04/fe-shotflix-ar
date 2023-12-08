@@ -2,7 +2,6 @@ import Link from "next/link";
 import Slider from "react-slick";
 import { settings } from "./constant";
 import SidebarContentFilm from "../SidebarContentFilm";
-import MovieMainContent from "./components/Movie";
 import { useSelector } from "react-redux";
 import Heading from "../Heading";
 import ItemMovie from "../ItemMovie";
@@ -72,18 +71,6 @@ const MainContentFilm = ({ toast }) => {
                     </Link>
                   </div>
 
-                  {/* <Slider {...settings}>
-                  {item?.dataFilm?.map((item, index) => {
-                    if (item !== null)
-                      return (
-                        <MovieMainContent
-                          key={item?._id}
-                          item={item}
-                          toast={toast}
-                        />
-                      );
-                  })}
-                </Slider> */}
                   {isFetching ? (
                     <Slider {...settings}>
                       {Array(5)

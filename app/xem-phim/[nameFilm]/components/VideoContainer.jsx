@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+"use client";
+import { useEffect, useRef, useState } from "react";
 import Plyr from "plyr";
 import Hls from "hls.js";
 import videojs from "video.js";
@@ -6,7 +7,6 @@ import videojs from "video.js";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import SkeletonImg from "@/components/SkeletonImg";
 
 let alreadyCalledVideoJs = false;
 // console.log("alreadyCalledVideoJs", alreadyCalledVideoJs);
@@ -14,6 +14,7 @@ let alreadyCalledVideoJs = false;
 const VideoContainer = ({ movie, nameFilm }) => {
   const router = useRouter();
   const refVideo = useRef();
+  console.log(movie);
   // console.log(refVideo.current);
   // let player = useRef(null);
   // const [playerInstance, setPlayerInstance] = useState(null);
@@ -514,18 +515,26 @@ const VideoContainer = ({ movie, nameFilm }) => {
       //   player.dispose();
       //   window.location.reload();
       // }
-      if (player && Hls.isSupported()) {
-        player?.destroy();
-      }
+      // if (player && Hls.isSupported()) {
+      //   player?.destroy();
+      // }
       if (hls && Hls.isSupported()) {
         hls?.destroy();
       }
     };
-  }, [movie, movie._id, nameFilm, refVideo.current]);
+  }, [movie, movie?._id, nameFilm, refVideo.current]);
 
-  let content;
+  // useEffect(() => {
+  //   if (!refVideo.current) {
+  //     content = (
+  //       <div className="players-container relative">
+  //         <SkeletonImg />
+  //       </div>
+  //     );
+  //   }
+  // }, [refVideo.current]);
 
-  content = (
+  return (
     <div className="players-container relative">
       <video
         className="video-js vjs-default-skin max-[480px]:h-[300px] min-[480px]:h-[450px] max-[767px]:h-[450px] md:h-[600px] w-full"
@@ -539,18 +548,6 @@ const VideoContainer = ({ movie, nameFilm }) => {
       ></video>
     </div>
   );
-
-  // useEffect(() => {
-  //   if (!refVideo.current) {
-  //     content = (
-  //       <div className="players-container relative">
-  //         <SkeletonImg />
-  //       </div>
-  //     );
-  //   }
-  // }, [refVideo.current]);
-
-  return content;
 };
 
 export default VideoContainer;

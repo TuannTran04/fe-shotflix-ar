@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
 import { memo, useEffect, useState } from "react";
@@ -278,7 +279,7 @@ const CommentFilm = ({ movieId, nameFilm }) => {
   // }, []); // Empty dependency array ensures the effect runs once on mount
 
   return (
-    <div className="mt-[40px] lg:mt-[70px] p-3 lg:p-6 bg-[#333333]">
+    <div className="mt-[40px] p-3 lg:p-6 bg-[#333333]">
       {/* <div
         className="fb-comments h-[700px] w-full overflow-y-auto"
         data-href="https://developers.facebook.com/docs/plugins/comments#configurator"

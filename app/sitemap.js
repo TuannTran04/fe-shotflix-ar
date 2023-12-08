@@ -26,7 +26,7 @@ const getAllFilms = async () => {
     if (!filmsResponse && !filmsResponse?.data?.movie) return null;
 
     const dataFilms = filmsResponse?.data?.movie;
-    console.log(dataFilms);
+    // console.log(dataFilms);
 
     return dataFilms;
   } catch (error) {
@@ -36,7 +36,8 @@ const getAllFilms = async () => {
 };
 
 export default async function sitemap() {
-  const baseURL = "http://localhost:3001";
+  // const baseURL = "http://localhost:3001";
+  const baseURL = "https://shotflix.vn";
 
   // Get All Categories from Server
   const categories = await getAllCategories();

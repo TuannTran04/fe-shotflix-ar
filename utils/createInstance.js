@@ -1,3 +1,4 @@
+"use client";
 import useRefreshToken from "@/hooks/useRefreshToken";
 import { logOut } from "@/store/apiRequest";
 import axios from "axios";

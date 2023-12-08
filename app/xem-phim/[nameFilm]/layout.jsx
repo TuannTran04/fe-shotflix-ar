@@ -55,6 +55,21 @@ export async function generateMetadata({ params }) {
   }
 }
 
+export async function generateStaticParams() {
+  const filmsResponse = await axios.get(
+    `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/get-all-movies-sitemap`
+  );
+
+  if (!filmsResponse && filmsResponse?.data?.movie?.length === 0) return [];
+
+  const dataFilms = filmsResponse?.data?.movie;
+  // console.log("page xem phim", dataFilms);
+
+  return dataFilms.map((film) => ({
+    nameFilm: film?.slug,
+  }));
+}
+
 export default function RootLayout({ children }) {
   return <main>{children}</main>;
 }

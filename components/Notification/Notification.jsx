@@ -391,7 +391,7 @@ const Notification = ({ test }) => {
                         )}
                         <span className="relative  w-[48px] h-[48px]  mr-[10px] overflow-hidden">
                           <Image
-                            src={item?.sender.avatar}
+                            src={item?.sender?.avatar || ""}
                             // src="https://yt3.ggpht.com/oEiclGnYQdKhndmRnTOI-V0qU0pwoijkwSs-dLgTGAzr9zcS6NGS-H3ryfRjhgs3LTZwkLjHyA=s300-c-k-c0x00ffffff-no-rj"
                             alt="pic"
                             className="object-cover rounded-[50%]"
@@ -401,8 +401,8 @@ const Notification = ({ test }) => {
 
                         <span className="flex flex-col flex-[2] overflow-hidden">
                           <p className="mb-[8px] text-sm text-white line-clamp-3 whitespace-normal text-ellipsis">
-                            <strong>{item?.sender.username}</strong> đã trả lời:
-                            "{item?.content}"
+                            <strong>{item?.sender?.username}</strong> đã trả
+                            lời: "{item?.content}"
                           </p>
                           <p className="text-xs text-gray-400 font-normal">
                             {timeAgo(new Date(item?.createdAt))}
