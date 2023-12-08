@@ -5,6 +5,11 @@ import LayoutRoot from "@/components/LayoutRoot";
 import FormEdit from "./components/FormEdit";
 import FormHeader from "./components/FormHeader";
 
+export const metadata = {
+  title: "Chỉnh sửa thông tin",
+  description: "Chỉnh sửa thông tin cá nhân",
+};
+
 const EditInfoUser = async ({ params }) => {
   const nameUserEdit = params.nameUserEdit;
 
