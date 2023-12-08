@@ -100,7 +100,7 @@ const UserManagePage = ({ params }) => {
               ></div>
 
               <div className="fixed top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-[200]">
-                <div className="relative w-[400px] h-[500px] sm:w-[500px] sm:h-[500px]  select-none z-[200]">
+                <div className="relative w-[400px] h-[500px] sm:w-[500px] sm:h-[600px] select-none z-[200]">
                   <Image
                     src={user?.avatar || "/unknowAvatar.webp"}
                     className="block flex-1 w-full object-cover z-[200]"

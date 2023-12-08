@@ -150,11 +150,15 @@ export const updateInfoUser = async (
   token,
   controller,
   dispatch,
-  axiosJWT
+  router,
+  axiosJWT,
+  toast,
+  setIsLoading
 ) => {
   // dispatch(getUsersStart());
   const base_url = process.env.NEXT_PUBLIC_URL;
   try {
+    setIsLoading(true);
     const res = await axiosJWT.put(
       `${base_url}/api/v1/user/update-info-user`,
       formData,
@@ -166,15 +170,21 @@ export const updateInfoUser = async (
         signal: controller.signal,
       }
     );
-    const newData = { ...res.data.data, accessToken: token };
-    // console.log(res);
-    if (res.status == 200) {
+    console.log(res);
+
+    if (res?.data && res?.data?.code === 200 && res?.data?.data) {
+      setIsLoading(false);
+      const newData = { ...res.data.data, accessToken: token };
       dispatch(loginSuccess(newData));
+      toast.success("Chỉnh sửa thành công!");
+      router.push("/trang-ca-nhan/" + res?.data?.data?.username);
     }
-    return res;
+
+    // return res;
   } catch (err) {
     // dispatch(getUsersFailed());
     // console.log(err);
+    setIsLoading(false);
     controller.abort();
     // throw new Error(err);
   }
