@@ -178,15 +178,17 @@ export const updateInfoUser = async (
       dispatch(loginSuccess(newData));
       toast.success("Chỉnh sửa thành công!");
       router.push("/trang-ca-nhan/" + res?.data?.data?.username);
+    } else {
+      toast.success("Eo dc!");
     }
 
     // return res;
   } catch (err) {
     // dispatch(getUsersFailed());
-    // console.log(err);
+    console.log(err);
     setIsLoading(false);
     controller.abort();
-    // throw new Error(err);
+    throw new Error(err);
   }
 };
 
