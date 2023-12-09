@@ -99,23 +99,15 @@ const UserManagePage = ({ params }) => {
                 }}
               ></div>
 
-              <div className="fixed top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-[200]">
-                <div className="relative w-[400px] h-[500px] sm:w-[500px] sm:h-[600px] select-none z-[200]">
+              <div className="fixed top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 border-[1px] border-[rgba(255,255,255,0.3)] z-[200]">
+                <div className="relative w-[400px] h-[500px] min-[450px]:w-[450px] sm:w-[640px] lg:w-[800px] xl:w-[1000px] select-none z-[200]">
                   <Image
                     src={user?.avatar || "/unknowAvatar.webp"}
-                    className="block flex-1 w-full object-cover z-[200]"
+                    className="block flex-1 w-full h-full object-contain z-[200]"
                     alt="big pic"
                     layout="fill"
                     priority
                   />
-                  <i
-                    className="fa-solid fa-xmark absolute top-1 right-1 w-[30px] h-[30px] bg-white opacity-60 rounded-[50%] z-[250] cursor-pointer hover:opacity-100
-                      before:flex before:h-full before:justify-center before:items-center 
-                      "
-                    onClick={() => {
-                      setShowBigAvatar(false);
-                    }}
-                  ></i>
                 </div>
               </div>
             </>
@@ -136,6 +128,17 @@ const UserManagePage = ({ params }) => {
               </Link>
             </div>
           </div>
+
+          {showBigAvatar && (
+            <span
+              className="w-[35px] h-[35px] flex justify-center items-center absolute top-2 right-2 bg-white opacity-60 rounded-[50%] z-[250] cursor-pointer hover:opacity-100"
+              onClick={() => {
+                setShowBigAvatar(false);
+              }}
+            >
+              <i className="fa-solid fa-xmark text-xl inline-block"></i>
+            </span>
+          )}
         </div>
 
         {/* TABs */}
