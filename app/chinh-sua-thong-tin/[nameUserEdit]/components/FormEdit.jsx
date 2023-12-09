@@ -19,6 +19,16 @@ const FormEdit = ({ toast }) => {
       .matches(/^\S*$/, "Username cannot contain spaces")
       .required(),
     email: yup.string().email("Invalid email format").required(),
+    avatar2: yup
+      .mixed()
+      .test("isImage", "Only image files are allowed", (value) => {
+        if (!value || !value.length) {
+          return true; // Chấp nhận trường rỗng
+        }
+
+        return value[0].type && value[0].type.startsWith("image/");
+      })
+      .nullable(),
   });
 
   const router = useRouter();
@@ -175,6 +185,7 @@ const FormEdit = ({ toast }) => {
               placeholder="link ảnh bất kỳ"
               {...register("avatar2", { required: false })}
             />
+            {<span className="text-red-500">{errors.avatar2?.message}</span>}
           </div>
           {isLoading ? (
             <Loading />
