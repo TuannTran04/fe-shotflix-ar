@@ -28,7 +28,7 @@ const VideoDetail = ({ movie }) => {
   const router = useRouter();
   // let axiosJWT = createAxios(user, null, null);
   // console.log(">>> accessToken in Rating <<<", accessToken);
-  let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const moviePhoto = movie && movie?.photo?.[0];
   // console.log(moviePhoto);
@@ -77,10 +77,10 @@ const VideoDetail = ({ movie }) => {
         }
       );
       console.log("ratingChanged", response);
-      if (response.data.code === 200) {
+      if (response.status === 200) {
         setIsRatingInProgress(false);
-        toast.success(response?.data.message);
-        setCurrentMovie(response.data.updatedMovie);
+        toast.success(response?.data.metadata?.message);
+        setCurrentMovie(response.data.metadata.updatedMovie);
       }
     } catch (error) {
       console.log(error);

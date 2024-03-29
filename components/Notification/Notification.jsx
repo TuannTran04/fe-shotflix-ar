@@ -19,6 +19,8 @@ import { io } from "socket.io-client";
 
 import Loading from "../Loading/Loading";
 import Image from "next/legacy/image";
+import { loginSuccess } from "@/store/authSlice";
+import { createAxios } from "@/utils/createInstance";
 
 function timeAgo(createdAt) {
   const currentTime = new Date();
@@ -59,10 +61,12 @@ const Notification = ({ test }) => {
   // console.log(containerMenuActionsRef.current);
 
   const router = useRouter();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.login.currentUser);
   const accessToken = user?.accessToken;
-  const id = user?._id;
-  // const dispatch = useDispatch();
+  const userId = user?._id;
+
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const [listNoti, setListNoti] = useState([]);
   // const [totalUnread, setTotalUnread] = useState(0);
@@ -99,19 +103,18 @@ const Notification = ({ test }) => {
   const deleteNotification = async (notifyId) => {
     // console.log("deleteNotification", notifyId);
     try {
-      const res = await deleteNotifyById(notifyId);
+      const res = await deleteNotifyById(notifyId, accessToken, axiosJWT);
       // console.log(">>> deleteNotification <<<", res);
 
-      if (res && res.data?.data) {
+      if (res && res.data?.metadata?.data) {
         setListNoti((prevNotify) => {
-          return prevNotify.filter((item) => item._id !== res.data?.data);
+          return prevNotify.filter((item) => item._id !== notifyId);
         });
         // socket.emit("comment-deleted", JSON.stringify(res.data.data));
       }
       // toast(res?.data?.message);
     } catch (err) {
       console.log(err);
-      throw new Error(err);
     }
   };
 
@@ -123,10 +126,10 @@ const Notification = ({ test }) => {
         return;
       }
 
-      const res = await updateNotifyRead(notifyId);
-      // console.log(">>> updateNotifyRead <<<", res);
+      const res = await updateNotifyRead(notifyId, accessToken, axiosJWT);
+      console.log(">>> updateNotifyRead <<<", res);
 
-      if (res && res.data?.data) {
+      if (res && res.data?.metadata?.data) {
         setListNoti((prevNotify) => {
           const updatedIsRead = prevNotify.map((notify) => {
             if (notify._id === notifyId) {
@@ -144,7 +147,6 @@ const Notification = ({ test }) => {
       }
     } catch (error) {
       console.log(err);
-      throw new Error(err);
     }
   };
 
@@ -241,15 +243,22 @@ const Notification = ({ test }) => {
   /////////////////////////////////////////////////////////////////////
 
   // handle render notifications
-  const fetchData = async (pageNumber) => {
+  const fetchData = async (pageNumber, controller) => {
     if (!hasMoreData) return;
     try {
       setLoading(true);
-      const notify = await getNotify(id, pageNumber, batchSize);
-      // console.log("fetchData", notify);
+      const notify = await getNotify(
+        userId,
+        pageNumber,
+        batchSize,
+        accessToken,
+        axiosJWT,
+        controller
+      );
+      console.log("fetchData", notify);
 
-      if (notify?.data.code === 200) {
-        const newNotifications = notify.data.data;
+      if (notify?.status === 200) {
+        const newNotifications = notify.data.metadata.data;
         // console.log("newNotifications.length", newNotifications.length);
 
         if (newNotifications.length === 0) {
@@ -265,6 +274,8 @@ const Notification = ({ test }) => {
         }
 
         setLoading(false);
+      } else {
+        setLoading(false);
       }
     } catch (err) {
       console.log(err);
@@ -273,13 +284,17 @@ const Notification = ({ test }) => {
   };
 
   const updateCountSeenNotify = async () => {
-    const updateSeenNotify = await updateNotifySeen(id);
-    // console.log("updateSeenNotify", updateSeenNotify);
+    const updateSeenNotify = await updateNotifySeen(
+      userId,
+      accessToken,
+      axiosJWT
+    );
+    console.log("updateSeenNotify", updateSeenNotify);
   };
 
   useEffect(() => {
     // console.log("alo", loadedOnce);
-    if (user && id && notifyRef.current && showNotification) {
+    if (user && userId && notifyRef.current && showNotification) {
       // notify chua seen thi call api
       if (totalUnseen > 0) {
         updateCountSeenNotify();
@@ -288,37 +303,58 @@ const Notification = ({ test }) => {
 
       // Fetch notify 1 lan khi bam icon bell
       if (!loadedOnce) {
-        fetchData(1);
+        const controller = new AbortController();
+
+        fetchData(1, controller);
         setLoadedOnce(true);
+
+        return () => {
+          controller.signal;
+        };
       }
     }
   }, [notifyRef, showNotification]);
 
   useEffect(() => {
     if (loadMore) {
-      fetchData(page);
+      const controller = new AbortController();
+      fetchData(page, controller);
+
+      return () => {
+        controller.signal;
+      };
     }
   }, [loadMore, page]);
 
   // get count unread notify
   useEffect(() => {
-    // Gọi API để lấy số lượng thông báo chưa đọc khi component tải lần đầu
-    const fetchUnreadNotifyCount = async () => {
-      try {
-        const response = await getUnreadNotifyCount(id); // Thay thế bằng cuộc gọi API thích hợp
-        console.log(response);
-        if (response?.data?.code === 200) {
-          // setTotalUnread(response.data.data.unreadNotifyCount);
-          setTotalUnseen(response.data.data.unseenNotifyCount);
-          setTotalNotify(response.data.data.totalCount);
+    if (user && userId && accessToken) {
+      const controller = new AbortController();
+      // Gọi API để lấy số lượng thông báo chưa đọc khi component tải lần đầu
+      const fetchUnreadNotifyCount = async () => {
+        try {
+          const response = await getUnreadNotifyCount(
+            userId,
+            accessToken,
+            axiosJWT,
+            controller
+          ); // Thay thế bằng cuộc gọi API thích hợp
+          console.log(response);
+          if (response?.status === 200) {
+            // setTotalUnread(response.data.data.unreadNotifyCount);
+            setTotalUnseen(response.data.metadata.data.unseenNotifyCount);
+            setTotalNotify(response.data.metadata.data.totalCount);
+          }
+        } catch (err) {
+          console.log(err);
         }
-      } catch (err) {
-        console.log(err);
-      }
-    };
+      };
 
-    if (user && id) {
       fetchUnreadNotifyCount();
+
+      return () => {
+        controller.signal;
+      };
     }
   }, []);
   // listNoti

@@ -1,7 +1,7 @@
 import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +16,8 @@ import {
 } from "../../../store/apiRequest";
 import { memo } from "react";
 import { io } from "socket.io-client";
+import { createAxios } from "@/utils/createInstance";
+import { loginSuccess } from "@/store/authSlice";
 
 function timeAgo(createdAt) {
   const currentTime = new Date();
@@ -60,10 +62,13 @@ const CommentUI = ({
   // socket,
 }) => {
   const router = useRouter();
+  const dispatch = useDispatch();
   // console.log("comment", router);
   const user = useSelector((state) => state.auth.login.currentUser);
   const userId = user?._id;
   const accessToken = user?.accessToken;
+
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const [textInputs, setTextInputs] = useState({
     updatedText: "",
@@ -130,14 +135,21 @@ const CommentUI = ({
         return;
       }
 
-      const res = await addReplyComment(userId, movieId, commentId, replyText);
+      const res = await addReplyComment(
+        userId,
+        movieId,
+        commentId,
+        replyText,
+        accessToken,
+        axiosJWT
+      );
       console.log(">>> handleAddReplyComment <<<", res);
 
-      if (res && res.data?.data) {
+      if (res.status === 200 && res.data?.metadata?.data) {
         setComments((prevComments) => {
           return prevComments.map((prevComment) => {
-            if (prevComment._id === res.data?.data._id) {
-              return res.data?.data;
+            if (prevComment._id === res.data?.metadata?.data._id) {
+              return res.data?.metadata?.data;
             } else {
               return prevComment;
             }
@@ -152,12 +164,14 @@ const CommentUI = ({
             movieId,
             // commentId, //cmt parent
             item._id, //cmt ma` minh` rep
-            replyText
+            replyText,
+            accessToken,
+            axiosJWT
           );
           console.log(">>> resAddNotify <<<", resAddNotify);
 
-          if (resAddNotify && resAddNotify.data?.data) {
-            console.log("emit", resAddNotify.data?.data);
+          if (resAddNotify && resAddNotify.data?.metadata?.data) {
+            console.log("emit", resAddNotify.data?.metadata?.data);
 
             // socket.emit(
             //   "new-notify-comment",
@@ -175,9 +189,9 @@ const CommentUI = ({
       }));
     } catch (err) {
       console.log(err);
-      throw new Error(err);
     }
   };
+
   const updateReplyComment = async (commentId, text) => {
     console.log("updateReplyComment", commentId, commentParentId, text);
     try {
@@ -191,28 +205,29 @@ const CommentUI = ({
         movieId,
         commentId,
         commentParentId,
-        text
+        text,
+        accessToken,
+        axiosJWT
       );
 
       console.log(">>> updateComment <<<", res);
 
-      if (res && res.data?.data) {
+      if (res.status === 200 && res.data?.metadata?.data) {
         setComments((prevComments) => {
           return prevComments.map((prevComment) => {
-            if (prevComment._id === res.data?.data._id) {
-              return res.data?.data;
+            if (prevComment._id === res.data?.metadata?.data._id) {
+              return res.data?.metadata?.data;
             } else {
               return prevComment;
             }
           });
         });
+        toast(res?.data?.message);
+        setShowEditingCommentId(null);
         // socket.emit("reply-comment-updated", JSON.stringify(res.data.data));
       }
-      toast(res?.data?.message);
-      setShowEditingCommentId(null);
     } catch (err) {
       console.log(err);
-      throw new Error(err);
     }
   };
 
@@ -233,27 +248,32 @@ const CommentUI = ({
         return;
       }
 
-      const res = await updateCommentById(userId, movieId, commentId, text);
+      const res = await updateCommentById(
+        userId,
+        movieId,
+        commentId,
+        text,
+        accessToken,
+        axiosJWT
+      );
       console.log(">>> updateComment <<<", res);
 
-      if (res && res.data?.data) {
+      if (res.status === 200 && res.data?.metadata?.data) {
         setComments((prevComments) => {
           return prevComments.map((prevComment) => {
-            if (prevComment._id === res.data?.data._id) {
-              return res.data?.data;
+            if (prevComment._id === res.data?.metadata?.data._id) {
+              return res.data?.metadata?.data;
             } else {
               return prevComment;
             }
           });
         });
+        toast(res?.data?.message);
+        setShowEditingCommentId(null);
         // socket.emit("comment-updated", JSON.stringify(res.data.data));
       }
-
-      toast(res?.data?.message);
-      setShowEditingCommentId(null);
     } catch (err) {
       console.log(err);
-      throw new Error(err);
     }
   };
 
@@ -266,21 +286,18 @@ const CommentUI = ({
         return;
       }
 
-      const res = await deleteCommentById(commentId);
+      const res = await deleteCommentById(commentId, accessToken, axiosJWT);
       console.log(">>> deleteComment <<<", res);
 
-      if (res && res.data?.data) {
+      if (res.status === 200) {
         setComments((prevComments) => {
-          return prevComments.filter(
-            (comment) => comment._id !== res.data?.data
-          );
+          return prevComments.filter((comment) => comment._id !== commentId);
         });
+        toast(res?.data?.message);
         // socket.emit("comment-deleted", JSON.stringify(res.data.data));
       }
-      //   toast(res?.data?.message);
     } catch (err) {
       console.log(err);
-      throw new Error(err);
     }
   };
   // DELETE COMMENT
@@ -292,17 +309,22 @@ const CommentUI = ({
         return;
       }
 
-      const res = await deleteReplyCommentById(commentId, commentParentId);
-      console.log(">>> deleteComment <<<", res);
+      const res = await deleteReplyCommentById(
+        commentId,
+        commentParentId,
+        accessToken,
+        axiosJWT
+      );
+      console.log(">>> deleteReplyCommentById <<<", res);
 
-      if (res && res.data?.data) {
+      if (res.status === 200) {
         setComments((prevComments) => {
           return prevComments.map((comment) => {
-            if (comment._id === res.data?.data.commentParentId) {
+            if (comment._id === commentParentId) {
               // Tạo một bản sao của comment và loại bỏ reply với commentId đã xóa
               const updatedComment = { ...comment };
               updatedComment.replies = updatedComment.replies.filter(
-                (reply) => reply._id !== res.data?.data.commentId
+                (reply) => reply._id !== commentId
               );
               return updatedComment;
             } else {
@@ -310,13 +332,11 @@ const CommentUI = ({
             }
           });
         });
+        toast(res?.data?.message);
         // socket.emit("reply-comment-deleted", JSON.stringify(res.data.data));
       }
-
-      //   toast(res?.data?.message);
     } catch (err) {
       console.log(err);
-      throw new Error(err);
     }
   };
 

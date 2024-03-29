@@ -31,8 +31,9 @@ const SearchFilmPage = ({ params }) => {
       try {
         const res = await searchMovies(queryStringDecodeURL);
         // console.log(">>> Results Search <<<", res);
-        if (res.data.code === 200) {
-          setArrMovie(res.data.data.movies);
+
+        if (res.status === 200 && res.data.metadata?.data?.movies.length > 0) {
+          setArrMovie(res.data.metadata.data.movies);
           setIsLoading(false);
         } else {
           setArrMovie([]);
@@ -53,7 +54,7 @@ const SearchFilmPage = ({ params }) => {
           `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
         );
 
-        const categories = categoriesResponse?.data?.data || [];
+        const categories = categoriesResponse?.data?.metadata?.data || [];
 
         if (categories.length > 0) {
           setCategories(categories);
@@ -82,17 +83,3 @@ const SearchFilmPage = ({ params }) => {
 };
 
 export default SearchFilmPage;
-
-// export async function getServerSideProps(context) {
-//   const queryString = context.params.queryString;
-
-//   let allCategory = await axios.get(
-//     `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
-//   );
-//   return {
-//     props: {
-//       queryString,
-//       categories: allCategory.data.data,
-//     },
-//   };
-// }

@@ -1,9 +1,12 @@
 "use client";
 import Image from "next/legacy/image";
 import Link from "next/link";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addBookmarkMovie, addFavoriteMovie } from "@/store/apiRequest";
 import { useEffect, useRef, useState } from "react";
+import { createAxios } from "@/utils/createInstance";
+import { loginSuccess } from "@/store/authSlice";
+import { useRouter } from "next/navigation";
 
 const ItemMovie = ({
   item,
@@ -28,9 +31,14 @@ const ItemMovie = ({
 
   // console.log(item);
 
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const user = useSelector((state) => state.auth.login.currentUser);
   const userId = user?._id;
   const accessToken = user?.accessToken;
+
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const containerMenu = useRef(null);
   const btnShowMenuFilm = useRef(null);
@@ -56,12 +64,14 @@ const ItemMovie = ({
           `Bạn có chắc muốn thêm ${title} vào danh sách yêu thích không?`
         )
       ) {
-        const res = await addFavoriteMovie(userId, _id);
+        const res = await addFavoriteMovie(userId, _id, accessToken, axiosJWT);
 
-        toast.success(res?.data?.message);
+        if (res.status === 200) {
+          toast.success(res?.data?.metadata?.message);
+        }
       }
     } catch (err) {
-      throw new Error(err);
+      console.log(err);
     }
   };
 
@@ -79,12 +89,14 @@ const ItemMovie = ({
           `Bạn có chắc muốn thêm ${title} vào danh sách xem sau không?`
         )
       ) {
-        const res = await addBookmarkMovie(userId, _id);
+        const res = await addBookmarkMovie(userId, _id, accessToken, axiosJWT);
 
-        toast.success(res?.data?.message);
+        if (res.status === 200) {
+          toast.success(res?.data?.metadata?.message);
+        }
       }
     } catch (err) {
-      throw new Error(err);
+      console.log(err);
     }
   };
 

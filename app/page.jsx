@@ -22,9 +22,10 @@ export default function Dashboard() {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.login?.currentUser);
+  console.log(user);
   const userId = user?._id;
   const accessToken = user?.accessToken;
-  let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const [categories, setCategories] = useState([]);
   // const [dataMovies, setDataMovies] = useState({});
@@ -43,7 +44,7 @@ export default function Dashboard() {
           `${process.env.NEXT_PUBLIC_URL}/api/v1/movie`
         );
 
-        const dataMovies = moviesResponse?.data?.data || {};
+        const dataMovies = moviesResponse?.data?.metadata.data || {};
 
         if (dataMovies) {
           // setDataMovies(dataMovies);
@@ -65,32 +66,32 @@ export default function Dashboard() {
   //   }
   // }, [dataMovies]);
 
-  useEffect(() => {
-    if (user && accessToken) {
-      // console.log("call film");
+  // useEffect(() => {
+  //   if (user && accessToken) {
+  //     // console.log("call film");
 
-      const controller = new AbortController();
+  //     const controller = new AbortController();
 
-      const fetchMovies = async () => {
-        try {
-          getFavoriteAndWatchLaterMovies(
-            accessToken,
-            dispatch,
-            axiosJWT,
-            controller
-          );
-        } catch (err) {
-          console.log(err);
-        }
-      };
+  //     const fetchMovies = async () => {
+  //       try {
+  //         getFavoriteAndWatchLaterMovies(
+  //           accessToken,
+  //           dispatch,
+  //           axiosJWT,
+  //           controller
+  //         );
+  //       } catch (err) {
+  //         console.log(err);
+  //       }
+  //     };
 
-      fetchMovies();
+  //     fetchMovies();
 
-      return () => {
-        controller.abort();
-      };
-    }
-  }, []);
+  //     return () => {
+  //       controller.abort();
+  //     };
+  //   }
+  // }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,8 +99,9 @@ export default function Dashboard() {
         const categoriesResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
         );
+        console.log(categoriesResponse);
 
-        const categories = categoriesResponse?.data?.data || [];
+        const categories = categoriesResponse?.data?.metadata?.data || [];
 
         if (categories.length > 0) {
           setCategories(categories);

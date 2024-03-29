@@ -29,8 +29,8 @@ export const login = async (user, dispatch, router, toast, setIsLoading) => {
       headers: { "Content-Type": "application/json" },
       withCredentials: true,
     });
-    // console.log(res);
-    if (res.data.code == 200) {
+    console.log(res);
+    if (res.data.status == 200) {
       // const { loveMovie, markBookMovie, ...other } = res.data.data;
       // console.log(loveMovie);
       // console.log(markBookMovie);
@@ -38,7 +38,7 @@ export const login = async (user, dispatch, router, toast, setIsLoading) => {
       // let c = res.data.data.accessToken.toString();
       // Cookies.set("user-server", "abc");
       // Cookies.set("accessToken", c);
-      dispatch(loginSuccess(res.data.data));
+      dispatch(loginSuccess(res.data.metadata));
       // dispatch(addArrFavorite(loveMovie));
       // dispatch(addArrWatchLater(markBookMovie));
       setIsLoading(false);
@@ -49,8 +49,11 @@ export const login = async (user, dispatch, router, toast, setIsLoading) => {
     console.log(err);
     setIsLoading(false);
     dispatch(loginFailed());
-    if (err?.response?.data?.code) {
-      toast(err.response.data.err.mes);
+    if (err?.response?.data?.code === 403) {
+      toast(err.response.data.message);
+    }
+    if (err?.response?.data?.code === 401) {
+      toast(err.response.data.message);
     }
   }
 };
@@ -92,7 +95,7 @@ export const registerOTP = async (
       const { username, password, email } = dataForm;
       dispatch(registerSuccess({ username, password, email }));
       setIsLoading(false);
-      toast(response?.data?.mes);
+      toast(response?.data?.message);
       router.push("/dang-nhap");
     }
   } catch (error) {
@@ -100,27 +103,25 @@ export const registerOTP = async (
     setIsLoading(false);
     dispatch(registerFailed());
 
-    if (error?.response?.data.mes.code === 11000) {
-      toast(`${Object.keys(error.response.data.mes.keyValue)[0]} đã tồn tại`);
+    if (error?.response?.data?.code == 401) {
+      toast(error?.response?.data?.message);
     }
-
     if (error?.response?.data?.code == 404) {
-      toast(error?.response?.data?.mes);
-      toast(error?.response?.data?.mes?.mes);
+      toast(error?.response?.data?.message);
     }
   }
 };
 
 export const logOut = async (dispatch, id, router) => {
   const base_url = process.env.NEXT_PUBLIC_URL;
-  dispatch(logOutStart());
   try {
+    dispatch(logOutStart());
+    dispatch(logOutSuccess());
+    dispatch(deleteSuccess_user());
     await axios.get(`${base_url}/api/v1/auth/logout`, {
       withCredentials: true,
     });
     // Cookies.remove("accessToken");
-    dispatch(logOutSuccess());
-    dispatch(deleteSuccess_user());
     router.push("/");
   } catch (err) {
     dispatch(logOutFailed());
@@ -172,12 +173,12 @@ export const updateInfoUser = async (
     );
     console.log(res);
 
-    if (res?.data && res?.data?.code === 200 && res?.data?.data) {
+    if (res?.status === 200 && res?.data?.metadata?.data) {
       setIsLoading(false);
-      const newData = { ...res.data.data, accessToken: token };
+      const newData = { ...res?.data?.metadata?.data, accessToken: token };
       dispatch(loginSuccess(newData));
       toast.success("Chỉnh sửa thành công!");
-      router.push("/trang-ca-nhan/" + res?.data?.data?.username);
+      router.push("/trang-ca-nhan/" + res?.data?.metadata?.data?.username);
     } else {
       toast.success("Eo dc!");
     }
@@ -188,7 +189,6 @@ export const updateInfoUser = async (
     console.log(err);
     setIsLoading(false);
     controller.abort();
-    throw new Error(err);
   }
 };
 
@@ -242,8 +242,8 @@ export const getFavoriteAndWatchLaterMovies = async (
       config
     );
 
-    dispatch(addArrFavorite(res.data.loveMovie));
-    dispatch(addArrWatchLater(res.data.markBookMovie));
+    dispatch(addArrFavorite(res.data.metadata.user.loveMovie));
+    dispatch(addArrWatchLater(res.data.metadata.user.markBookMovie));
 
     console.log(">>> getFavoriteAndWatchLaterMovies <<<", res);
     return res;
@@ -314,14 +314,22 @@ export const getWatchLaterMovies = async (
   }
 };
 
-export const addFavoriteMovie = async (userId, movieId) => {
+export const addFavoriteMovie = async (
+  userId,
+  movieId,
+  accessToken,
+  axiosJWT
+) => {
   const data = { userId, movieId };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.post(
+    const res = await axiosJWT.post(
       `${base_url}/api/v1/movie/add-favorite-movie`,
-      data
+      data,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
     );
     return res;
     // dispatch(getUsersSuccess(res.data));
@@ -331,14 +339,22 @@ export const addFavoriteMovie = async (userId, movieId) => {
     throw new Error(err);
   }
 };
-export const deleteFavoriteMovie = async (userId, movieId) => {
+export const deleteFavoriteMovie = async (
+  userId,
+  movieId,
+  accessToken,
+  axiosJWT
+) => {
   const data = { userId, movieId };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.post(
+    const res = await axiosJWT.post(
       `${base_url}/api/v1/movie/delete-favorite-movie`,
-      data
+      data,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
     );
     return res;
     // dispatch(getUsersSuccess(res.data));
@@ -349,14 +365,22 @@ export const deleteFavoriteMovie = async (userId, movieId) => {
   }
 };
 
-export const addBookmarkMovie = async (userId, movieId) => {
+export const addBookmarkMovie = async (
+  userId,
+  movieId,
+  accessToken,
+  axiosJWT
+) => {
   const data = { userId, movieId };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.post(
+    const res = await axiosJWT.post(
       `${base_url}/api/v1/movie/add-bookmark-movie`,
-      data
+      data,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
     );
     console.log(res);
     return res;
@@ -367,14 +391,22 @@ export const addBookmarkMovie = async (userId, movieId) => {
     throw new Error(err);
   }
 };
-export const deleteBookmarkMovie = async (userId, movieId) => {
+export const deleteBookmarkMovie = async (
+  userId,
+  movieId,
+  accessToken,
+  axiosJWT
+) => {
   const data = { userId, movieId };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.post(
+    const res = await axiosJWT.post(
       `${base_url}/api/v1/movie/delete-bookmark-movie`,
-      data
+      data,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+      }
     );
     console.log(res);
     return res;
@@ -405,12 +437,73 @@ export const ratingMovie = async (token, dispatch, axiosJWT, data) => {
 };
 
 ////////////////////******************** COMMENT ********************////////////////////////////
-export const getComment = async (movieId, page, batchSize) => {
+export const getCommentV2 = async (
+  movieId,
+  nextCursor,
+  batchSize,
+  accessToken,
+  axiosJWT,
+  controller
+) => {
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.get(
-      `${base_url}/api/v1/comment/${movieId}?page=${page}&batchSize=${batchSize}`
+    const res = await axiosJWT.get(
+      `${base_url}/api/v1/comment/getAllCmtV2/${movieId}?&batchSize=${batchSize}&nextCursor=${nextCursor}`,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+        signal: controller.signal,
+      }
+    );
+
+    return res;
+  } catch (err) {
+    console.log(err);
+    // throw new Error(err);
+  }
+};
+export const getCommentInBranchV2 = async (
+  movieId,
+  parentCommentId,
+  nextCursorChild,
+  batchSize,
+  accessToken,
+  axiosJWT,
+  controller
+) => {
+  const base_url = process.env.NEXT_PUBLIC_URL;
+  // dispatch(getUsersStart());
+  try {
+    const res = await axiosJWT.get(
+      `${base_url}/api/v1/comment/getCmtInBranchV2/${movieId}/${parentCommentId}?nextCursor=${nextCursorChild}&batchSize=${batchSize}`,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+        signal: controller.signal,
+      }
+    );
+    return res;
+  } catch (err) {
+    console.log(err);
+    controller.abort();
+  }
+};
+export const getComment = async (
+  movieId,
+  page,
+  batchSize,
+  accessToken,
+  axiosJWT,
+  controller
+) => {
+  const base_url = process.env.NEXT_PUBLIC_URL;
+  // dispatch(getUsersStart());
+  try {
+    const res = await axiosJWT.get(
+      `${base_url}/api/v1/comment/${movieId}?page=${page}&batchSize=${batchSize}`,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+        signal: controller.signal,
+      }
     );
     // console.log(res);
     return res;
@@ -421,55 +514,138 @@ export const getComment = async (movieId, page, batchSize) => {
     throw new Error(err);
   }
 };
-export const addComment = async (userId, movieId, text) => {
+export const addCommentV2 = async (
+  userId,
+  movieId,
+  parentCommentId = null,
+  text,
+  accessToken,
+  axiosJWT
+) => {
+  const data = { userId, movieId, text, parentCommentId };
+  const base_url = process.env.NEXT_PUBLIC_URL;
+  try {
+    const res = await axiosJWT.post(
+      `${base_url}/api/v1/comment/add-commentV2`,
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const addComment = async (
+  userId,
+  movieId,
+  text,
+  accessToken,
+  axiosJWT
+) => {
   const data = { userId, movieId, text };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.post(
+    const res = await axiosJWT.post(
       `${base_url}/api/v1/comment/add-comment`,
-      data
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     return res;
     // dispatch(getUsersSuccess(res.data));
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
-export const addReplyComment = async (userId, movieId, commentId, text) => {
+export const addReplyComment = async (
+  userId,
+  movieId,
+  commentId,
+  text,
+  accessToken,
+  axiosJWT
+) => {
   const data = { userId, movieId, commentId, text };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.post(
+    const res = await axiosJWT.post(
       `${base_url}/api/v1/comment/add-reply-comment`,
-      data
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     return res;
     // dispatch(getUsersSuccess(res.data));
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
-export const updateCommentById = async (userId, movieId, commentId, text) => {
+export const updateCommentByIdV2 = async (
+  userId,
+  movieId,
+  commentId,
+  text,
+  accessToken,
+  axiosJWT
+) => {
   const data = { userId, movieId, commentId, text };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.put(
+    const res = await axiosJWT.put(
+      `${base_url}/api/v1/comment/update-commentV2`,
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const updateCommentById = async (
+  userId,
+  movieId,
+  commentId,
+  text,
+  accessToken,
+  axiosJWT
+) => {
+  const data = { userId, movieId, commentId, text };
+  const base_url = process.env.NEXT_PUBLIC_URL;
+  // dispatch(getUsersStart());
+  try {
+    const res = await axiosJWT.put(
       `${base_url}/api/v1/comment/update-comment`,
-      data
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     return res;
     // dispatch(getUsersSuccess(res.data));
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
 export const updateReplyCommentById = async (
@@ -477,64 +653,105 @@ export const updateReplyCommentById = async (
   movieId,
   commentId,
   commentParentId,
-  text
+  text,
+  accessToken,
+  axiosJWT
 ) => {
   const data = { userId, movieId, commentId, commentParentId, text };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.put(
+    const res = await axiosJWT.put(
       `${base_url}/api/v1/comment/update-reply-comment`,
-      data
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     return res;
     // dispatch(getUsersSuccess(res.data));
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
-export const deleteCommentById = async (commentId) => {
+export const deleteCommentByIdV2 = async (commentId, accessToken, axiosJWT) => {
   const base_url = process.env.NEXT_PUBLIC_URL;
-  // dispatch(getUsersStart());
   try {
-    const res = await axios.delete(
-      `${base_url}/api/v1/comment/delete-comment/${commentId}`
+    const res = await axiosJWT.delete(
+      `${base_url}/api/v1/comment/delete-commentV2/${commentId}`,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     console.log(res);
     return res;
-    // dispatch(getUsersSuccess(res.data));
   } catch (err) {
-    // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
-export const deleteReplyCommentById = async (commentId, commentParentId) => {
+export const deleteCommentById = async (commentId, accessToken, axiosJWT) => {
   const base_url = process.env.NEXT_PUBLIC_URL;
-  // dispatch(getUsersStart());
   try {
-    const res = await axios.delete(
-      `${base_url}/api/v1/comment/delete-reply-comment/${commentParentId}/${commentId}`
+    const res = await axiosJWT.delete(
+      `${base_url}/api/v1/comment/delete-comment/${commentId}`,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     console.log(res);
     return res;
-    // dispatch(getUsersSuccess(res.data));
   } catch (err) {
-    // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
+  }
+};
+export const deleteReplyCommentById = async (
+  commentId,
+  commentParentId,
+  accessToken,
+  axiosJWT
+) => {
+  const base_url = process.env.NEXT_PUBLIC_URL;
+  try {
+    const res = await axiosJWT.delete(
+      `${base_url}/api/v1/comment/delete-reply-comment/${commentParentId}/${commentId}`,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    console.log(res);
+    return res;
+  } catch (err) {
+    console.log(err);
   }
 };
 
 ////////////////////******************** NOTIFY ********************////////////////////////////
-export const getNotify = async (id, page, batchSize) => {
+export const getNotify = async (
+  id,
+  page,
+  batchSize,
+  accessToken,
+  axiosJWT,
+  controller
+) => {
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.get(
-      `${base_url}/api/v1/notify/${id}?page=${page}&batchSize=${batchSize}`
+    const res = await axiosJWT.get(
+      `${base_url}/api/v1/notify/${id}?page=${page}&batchSize=${batchSize}`,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+        signal: controller.signal,
+      }
     );
     // console.log(res);
     return res;
@@ -542,15 +759,23 @@ export const getNotify = async (id, page, batchSize) => {
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
-export const getUnreadNotifyCount = async (id) => {
+export const getUnreadNotifyCount = async (
+  id,
+  accessToken,
+  axiosJWT,
+  controller
+) => {
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.get(
-      `${base_url}/api/v1/notify/get-unread-notify/${id}`
+    const res = await axiosJWT.get(
+      `${base_url}/api/v1/notify/get-unread-notify/${id}`,
+      {
+        headers: { token: `Bearer ${accessToken}` },
+        signal: controller.signal,
+      }
     );
     // console.log(res);
     return res;
@@ -558,7 +783,6 @@ export const getUnreadNotifyCount = async (id) => {
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
 export const addNotify = async (
@@ -566,61 +790,81 @@ export const addNotify = async (
   recipient,
   movieId,
   commentId,
-  text
+  text,
+  accessToken,
+  axiosJWT
 ) => {
   const data = { sender, recipient, movieId, commentId, text };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.post(`${base_url}/api/v1/notify/add-notify`, data);
-    return res;
-    // dispatch(getUsersSuccess(res.data));
-  } catch (err) {
-    // dispatch(getUsersFailed());
-    console.log(err);
-    throw new Error(err);
-  }
-};
-export const updateNotifyRead = async (notifyId) => {
-  const data = { notifyId };
-  const base_url = process.env.NEXT_PUBLIC_URL;
-  // dispatch(getUsersStart());
-  try {
-    const res = await axios.put(
-      `${base_url}/api/v1/notify/update-notify-read`,
-      data
+    const res = await axiosJWT.post(
+      `${base_url}/api/v1/notify/add-notify`,
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     return res;
     // dispatch(getUsersSuccess(res.data));
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
-export const updateNotifySeen = async (userId) => {
+export const updateNotifyRead = async (notifyId, accessToken, axiosJWT) => {
+  const data = { notifyId };
+  const base_url = process.env.NEXT_PUBLIC_URL;
+
+  try {
+    const res = await axiosJWT.put(
+      `${base_url}/api/v1/notify/update-notify-read`,
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const updateNotifySeen = async (userId, accessToken, axiosJWT) => {
   const data = { userId };
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.put(
+    const res = await axiosJWT.put(
       `${base_url}/api/v1/notify/update-notify-seen`,
-      data
+      data,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     return res;
     // dispatch(getUsersSuccess(res.data));
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };
-export const deleteNotifyById = async (notifyId) => {
+export const deleteNotifyById = async (notifyId, accessToken, axiosJWT) => {
   const base_url = process.env.NEXT_PUBLIC_URL;
   // dispatch(getUsersStart());
   try {
-    const res = await axios.delete(
-      `${base_url}/api/v1/notify/delete-notify/${notifyId}`
+    const res = await axiosJWT.delete(
+      `${base_url}/api/v1/notify/delete-notify/${notifyId}`,
+      {
+        headers: {
+          token: `Bearer ${accessToken}`,
+        },
+      }
     );
     console.log(res);
     return res;
@@ -628,6 +872,5 @@ export const deleteNotifyById = async (notifyId) => {
   } catch (err) {
     // dispatch(getUsersFailed());
     console.log(err);
-    throw new Error(err);
   }
 };

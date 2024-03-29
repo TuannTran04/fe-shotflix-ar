@@ -16,14 +16,14 @@ export async function generateMetadata({ params }) {
       `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/user/${nameFilm}`
     );
 
-    if (!res && !res.data?.data) {
+    if (!res && !res.data?.metadata.data) {
       return {
         title: "Không tìm thấy",
         description: "Trang này không tồn tại",
       };
     }
 
-    let [movie] = res.data.data.movieSingle;
+    let [movie] = res.data.metadata.data.movieSingle;
 
     // console.log("res meta", movie);
 
@@ -60,10 +60,11 @@ export async function generateStaticParams() {
     `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/get-all-movies-sitemap`
   );
 
-  if (!filmsResponse && filmsResponse?.data?.movie?.length === 0) return [];
+  if (!filmsResponse && filmsResponse?.data?.metadata?.movie?.length === 0)
+    return [];
 
-  const dataFilms = filmsResponse?.data?.movie;
-  // console.log("page xem phim", dataFilms);
+  const dataFilms = filmsResponse?.data?.metadata?.movie;
+  console.log("page xem phims", dataFilms);
 
   return dataFilms.map((film) => ({
     nameFilm: film?.slug,

@@ -42,10 +42,12 @@ const CategoryPage = ({ params }) => {
             currentPage,
             pageSize
           );
-          console.log(">>> Category Film <<<", res?.data.data.movies);
-          console.log(">>> Category Film <<<", res?.data.data.totalCount);
-          setArrMovie(res?.data.data.movies);
-          setTotalPages(Math.ceil(res?.data.data.totalCount / pageSize));
+          console.log(">>> Category Film <<<", res);
+
+          setArrMovie(res?.data.metadata.data.movies);
+          setTotalPages(
+            Math.ceil(res?.data.metadata.data.totalCount / pageSize)
+          );
           setIsLoading(false);
         }
       } catch (err) {
@@ -63,10 +65,10 @@ const CategoryPage = ({ params }) => {
           `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
         );
 
-        const categories = categoriesResponse?.data?.data || [];
+        const categories = categoriesResponse?.data?.metadata?.data || [];
 
         if (categories.length > 0) {
-          const [category] = categoriesResponse?.data?.data.filter(
+          const [category] = categories.filter(
             (item) => item.slug === slugCategory
           );
 

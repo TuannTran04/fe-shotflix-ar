@@ -6,16 +6,17 @@ import { deleteFavoriteMovie } from "../../../../store/apiRequest";
 import Link from "next/link";
 import Image from "next/legacy/image";
 import { addArrFavorite } from "@/store/filmSlice";
+import { loginSuccess } from "@/store/authSlice";
+import { useRouter } from "next/navigation";
 
-const Favorite = ({ movie, toast, setArrFavoriteMovie }) => {
+const Favorite = ({ movie, toast, arrFavoriteMovie, setArrFavoriteMovie }) => {
   const user = useSelector((state) => state.auth.login.currentUser);
   const userId = user?._id;
+  const router = useRouter();
   const dispatch = useDispatch();
   const accessToken = user?.accessToken;
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
   const [showMenu, setShowMenu] = useState(false);
-
-  const film = useSelector((state) => state.film);
-  const { favoriteFilm } = film;
 
   const containerMenu = useRef(null);
   const btnShowMenuFilm = useRef(null);
@@ -40,21 +41,26 @@ const Favorite = ({ movie, toast, setArrFavoriteMovie }) => {
           `Bạn có chắc muốn xóa ${movie?.title} khỏi danh sách yêu thích không?`
         )
       ) {
-        const res = await deleteFavoriteMovie(userId, movie._id);
+        const res = await deleteFavoriteMovie(
+          userId,
+          movie._id,
+          accessToken,
+          axiosJWT
+        );
         // console.log(">>> deleteFavoriteMovie <<<", res);
 
         setArrFavoriteMovie((prevFavorires) => {
           return prevFavorires.filter((favorite) => favorite._id !== movie._id);
         });
 
-        const newArrFavMovie = favoriteFilm.filter(
-          (film) => film._id !== movie._id
-        );
+        // const newArrFavMovie = arrFavoriteMovie.filter(
+        //   (film) => film._id !== movie._id
+        // );
         // console.log("newArrFavMovie", newArrFavMovie);
 
         if (res.status === 200) {
-          dispatch(addArrFavorite([...newArrFavMovie]));
-          toast.success(res?.data?.message);
+          // dispatch(addArrFavorite([...newArrFavMovie]));
+          toast.success(res?.data?.metadata?.message);
         }
       }
     } catch (err) {

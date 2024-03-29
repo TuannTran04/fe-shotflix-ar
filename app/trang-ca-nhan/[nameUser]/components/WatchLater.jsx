@@ -5,16 +5,24 @@ import { deleteBookmarkMovie } from "../../../../store/apiRequest";
 import Link from "next/link";
 import Image from "next/legacy/image";
 import { addArrWatchLater } from "@/store/filmSlice";
+import { loginSuccess } from "@/store/authSlice";
+import { useRouter } from "next/navigation";
+import { createAxios } from "@/utils/createInstance";
 
-const WatchLater = ({ movie, toast, setArrWatchLaterMovie }) => {
+const WatchLater = ({
+  movie,
+  toast,
+  arrWatchLaterMovie,
+  setArrWatchLaterMovie,
+}) => {
   const user = useSelector((state) => state.auth.login.currentUser);
   const userId = user?._id;
   const dispatch = useDispatch();
+  const router = useRouter();
   const accessToken = user?.accessToken;
-  const [showMenu, setShowMenu] = useState(false);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
-  const film = useSelector((state) => state.film);
-  const { watchLaterFilm } = film;
+  const [showMenu, setShowMenu] = useState(false);
 
   const containerMenu = useRef(null);
   const btnShowMenuFilm = useRef(null);
@@ -39,7 +47,12 @@ const WatchLater = ({ movie, toast, setArrWatchLaterMovie }) => {
           `Bạn có chắc muốn xóa ${movie?.title} khỏi danh sách xem sau không?`
         )
       ) {
-        const res = await deleteBookmarkMovie(userId, movie._id);
+        const res = await deleteBookmarkMovie(
+          userId,
+          movie._id,
+          accessToken,
+          axiosJWT
+        );
         // console.log(res);
 
         setArrWatchLaterMovie((prevWatchLaters) => {
@@ -48,14 +61,14 @@ const WatchLater = ({ movie, toast, setArrWatchLaterMovie }) => {
           );
         });
 
-        const newArrBookMarkMovie = watchLaterFilm.filter(
-          (film) => film._id !== movie._id
-        );
+        // const newArrBookMarkMovie = arrWatchLaterMovie.filter(
+        //   (film) => film._id !== movie._id
+        // );
         // console.log("newArrBookMarkMovie", newArrBookMarkMovie);
 
         if (res.status === 200) {
-          dispatch(addArrWatchLater([...newArrBookMarkMovie]));
-          toast.success(res?.data?.message);
+          // dispatch(addArrWatchLater([...newArrBookMarkMovie]));
+          toast.success(res?.data?.metadata?.message);
         }
       }
     } catch (err) {
@@ -112,7 +125,10 @@ const WatchLater = ({ movie, toast, setArrWatchLaterMovie }) => {
           </span>
 
           {showMenu && (
-            <span className="py-1 absolute top-0 right-[100%] bg-white min-w-[100px] z-40">
+            <span
+              className="py-1 absolute top-0 right-[100%] bg-white min-w-[100px] z-40"
+              ref={containerMenu}
+            >
               <span
                 className="px-2 flex justify-start items-center hover:bg-[rgba(0,0,0,0.3)] z-50"
                 onClick={handleDeleteBookmark}

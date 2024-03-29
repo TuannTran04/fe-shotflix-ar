@@ -27,9 +27,10 @@ export async function generateStaticParams() {
     `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
   );
 
-  if (!categoriesResponse && !categoriesResponse?.data?.data) return [];
+  if (!categoriesResponse && !categoriesResponse?.data?.metadata?.data)
+    return [];
 
-  const dataCategories = categoriesResponse?.data?.data;
+  const dataCategories = categoriesResponse?.data?.metadata?.data;
   // console.log(dataCategories);
 
   return dataCategories.map((cate) => ({

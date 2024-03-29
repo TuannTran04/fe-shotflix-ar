@@ -41,9 +41,11 @@ const MoreFilm = ({ params }) => {
         const res = await getMoreMovies(nameMoreFilm, currentPage, pageSize);
 
         console.log(">>> getMoreMovies Film <<<", res);
-        setArrMovie(res.data.data);
-        setTotalPages(Math.ceil(res.data.totalCount / pageSize));
-        setIsLoading(false);
+        if (res.status === 200) {
+          setArrMovie(res.data.metadata.data);
+          setTotalPages(Math.ceil(res.data.metadata.totalCount / pageSize));
+          setIsLoading(false);
+        }
       } catch (err) {
         console.log(err);
         setIsLoading(false);
@@ -65,7 +67,7 @@ const MoreFilm = ({ params }) => {
           `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
         );
 
-        const categories = categoriesResponse?.data?.data || [];
+        const categories = categoriesResponse?.data?.metadata?.data || [];
 
         if (categories.length > 0) {
           setCategories(categories);

@@ -47,8 +47,9 @@ export default function Header({ categories }) {
     // search the api
     async function fetchData() {
       const res = await searchMovies(searchInput);
-      if (res.data.code === 200) {
-        setArrSearchMovie(res.data.data.movies);
+      console.log(res);
+      if (res.status === 200 && res.data.metadata?.data?.movies.length > 0) {
+        setArrSearchMovie(res.data.metadata.data.movies);
         setIsLoading(false);
       } else {
         setArrSearchMovie([]);

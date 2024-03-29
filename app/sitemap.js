@@ -6,9 +6,10 @@ const getAllCategories = async () => {
       `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
     );
 
-    if (!categoriesResponse && !categoriesResponse?.data?.data) return null;
+    if (!categoriesResponse && !categoriesResponse?.data?.metadata?.data)
+      return null;
 
-    const dataCategories = categoriesResponse?.data?.data;
+    const dataCategories = categoriesResponse?.data?.metadata?.data;
     console.log(dataCategories);
 
     return dataCategories;
@@ -23,9 +24,9 @@ const getAllFilms = async () => {
       `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/get-all-movies-sitemap`
     );
 
-    if (!filmsResponse && !filmsResponse?.data?.movie) return null;
+    if (!filmsResponse && !filmsResponse?.data?.metadata?.movie) return null;
 
-    const dataFilms = filmsResponse?.data?.movie;
+    const dataFilms = filmsResponse?.data?.metadata?.movie;
     // console.log(dataFilms);
 
     return dataFilms;
@@ -36,8 +37,8 @@ const getAllFilms = async () => {
 };
 
 export default async function sitemap() {
-  // const baseURL = "http://localhost:3001";
-  const baseURL = "https://shotflix.vn";
+  const baseURL = "http://localhost:3001";
+  // const baseURL = "https://shotflix.vn";
 
   // Get All Categories from Server
   const categories = await getAllCategories();

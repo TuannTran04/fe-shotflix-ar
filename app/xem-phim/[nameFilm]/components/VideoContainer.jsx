@@ -280,18 +280,28 @@ const VideoContainer = ({ movie, nameFilm }) => {
               // Đặt sự kiện cho Plyr khi video được update time
               let alreadyCalled = false;
               player.on("timeupdate", async (event) => {
-                // console.log("Video is timeupdate");
+                console.log("Video is timeupdate");
                 let currentTime = event.detail.plyr.currentTime;
                 const duration = event.detail.plyr.duration;
+                console.log(
+                  "currentTime >= duration / 2 >>",
+                  currentTime,
+                  duration,
+                  currentTime >= duration / 2
+                );
 
-                if (currentTime >= duration / 2 && !alreadyCalled) {
+                if (
+                  currentTime > 0 &&
+                  currentTime >= duration / 2 &&
+                  !alreadyCalled
+                ) {
                   const movieId = movie?._id;
                   const data = { userId, movieId, duration };
                   const base_url = process.env.NEXT_PUBLIC_URL;
 
                   try {
                     const incrView = await axios.put(
-                      `${base_url}/api/v1/movie/update-views`,
+                      `${base_url}/api/v1/movie/update-viewsV2`,
                       data
                     );
                     console.log(">>> update-views <<<", incrView);

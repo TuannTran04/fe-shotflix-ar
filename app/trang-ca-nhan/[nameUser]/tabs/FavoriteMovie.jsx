@@ -15,7 +15,7 @@ const FavoriteMovie = () => {
   const user = useSelector((state) => state.auth.login.currentUser);
   const accessToken = user?.accessToken;
   const userId = user?._id;
-  let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const [arrFavoriteMovie, setArrFavoriteMovie] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,9 +33,9 @@ const FavoriteMovie = () => {
           axiosJWT,
           controller
         );
-        // console.log(">>> Favorite Film <<<", res);
+        console.log(">>> Favorite Film <<<", res);
         if (res.status === 200) {
-          isMounted && setArrFavoriteMovie(res.data.loveMovie);
+          isMounted && setArrFavoriteMovie(res.data.metadata?.user?.loveMovie);
           setIsLoading(false);
         }
       } catch (err) {
@@ -65,6 +65,7 @@ const FavoriteMovie = () => {
               key={movie._id}
               movie={movie}
               toast={toast}
+              arrFavoriteMovie={arrFavoriteMovie}
               setArrFavoriteMovie={setArrFavoriteMovie}
             />
           ))

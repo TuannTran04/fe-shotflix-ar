@@ -3,7 +3,7 @@ import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
 import { memo, useEffect, useState } from "react";
 import { addComment, getComment } from "../../store/apiRequest";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CommentUI from "./components/CommentUI";
@@ -12,6 +12,8 @@ import { useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Loading from "../Loading/Loading";
 import Cookie from "js-cookie";
+import { createAxios } from "@/utils/createInstance";
+import { loginSuccess } from "@/store/authSlice";
 
 const CommentFilm = ({ movieId, nameFilm }) => {
   const [comments, setComments] = useState([]);
@@ -44,15 +46,15 @@ const CommentFilm = ({ movieId, nameFilm }) => {
     }
   }, [commentIdScrollTo, comments, hasScrolled]);
 
-  const socket = useRef();
+  // const socket = useRef();
   const router = useRouter();
+  const dispatch = useDispatch();
   // console.log("comment", router);
   const user = useSelector((state) => state.auth.login.currentUser);
   const userId = user?._id;
   const accessToken = user?.accessToken;
-  const refreshToken = Cookie.get("refreshTokenJWT");
 
-  // console.log(refreshToken);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const [textInputs, setTextInputs] = useState({
     commentInput: "",
@@ -82,22 +84,27 @@ const CommentFilm = ({ movieId, nameFilm }) => {
         toast("Chưa có nội dung bình luận");
         return;
       }
-      const res = await addComment(userId, movieId, commentInput);
+      const res = await addComment(
+        userId,
+        movieId,
+        commentInput,
+        accessToken,
+        axiosJWT
+      );
       console.log(">>> addComment <<<", res);
-      toast(res?.data?.message);
-      if (res && res.data?.data) {
+      if (res.status === 200 && res.data?.metadata?.data) {
+        toast(res?.data?.message);
         setComments((prevComments) => {
-          return [res.data.data, ...prevComments];
+          return [res.data.metadata.data, ...prevComments];
         });
+        setTextInputs((prevState) => ({
+          ...prevState,
+          commentInput: "",
+        }));
         // socket.current.emit("new-comment", JSON.stringify(res.data.data));
       }
-      setTextInputs((prevState) => ({
-        ...prevState,
-        commentInput: "",
-      }));
     } catch (err) {
       console.log(err);
-      throw new Error(err);
     }
   };
 
@@ -209,39 +216,52 @@ const CommentFilm = ({ movieId, nameFilm }) => {
   };
 
   useEffect(() => {
-    const renderComments = async () => {
-      try {
-        setLoading(true);
-        // console.log("siuu");
-
-        let comments = await getComment(movieId, page, batchSize);
-
-        if (comments.data.code === 200) {
-          const newComments = comments.data.data;
-          // console.log("newComments", comments);
-          setTotalComments(comments.data.count);
-
-          if (newComments.length === 0) {
-            setHasMoreData(false);
-            setLoading(false);
-          } else {
-            if (page === 1) {
-              setComments(newComments);
-            } else {
-              setComments((prev) => [...prev, ...newComments]);
-            }
-
-            setLoading(false);
-          }
-        }
-      } catch (err) {
-        console.log(err);
-        setLoading(false);
-      }
-    };
-
     if (movieId && hasMoreData) {
+      const controller = new AbortController();
+      const renderComments = async () => {
+        try {
+          setLoading(true);
+          // console.log("siuu");
+
+          let comments = await getComment(
+            movieId,
+            page,
+            batchSize,
+            accessToken,
+            axiosJWT,
+            controller
+          );
+          console.log(">>> GET COMMENTS <<<", comments);
+
+          if (comments.status === 200) {
+            const newComments = comments.data.metadata.data;
+            // console.log("newComments", comments);
+            setTotalComments(comments.data.metadata.count);
+
+            if (newComments.length === 0) {
+              setHasMoreData(false);
+              setLoading(false);
+            } else {
+              if (page === 1) {
+                setComments(newComments);
+              } else {
+                setComments((prev) => [...prev, ...newComments]);
+              }
+
+              setLoading(false);
+            }
+          }
+        } catch (err) {
+          console.log(err);
+          setLoading(false);
+        }
+      };
+
       renderComments();
+
+      return () => {
+        controller.signal;
+      };
     }
   }, [movieId, nameFilm, page, hasMoreData]);
 

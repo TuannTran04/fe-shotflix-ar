@@ -1,5 +1,5 @@
 import axios from "axios";
-import CommentFilm from "../../../components/CommentFilm2";
+import CommentFilm from "../../../components/CommentFilm3";
 import SliderTopRatingofWeek from "../../../components/SliderRelatedFilm";
 import VideoContainer from "./components/VideoContainer";
 import VideoDetail from "./components/VideoDetail";
@@ -19,9 +19,9 @@ const PlayFilmPage = async ({ params }) => {
         `${process.env.NEXT_PUBLIC_URL}/api/v1/movie/user/${nameFilm}`
       );
 
-      if (res.data.code === 200 && res.data.data.movieSingle.length > 0) {
+      if (res.status === 200 && res.data.metadata.data.movieSingle.length > 0) {
         // console.log(">>> Results Search <<<", res.data.data.movieSingle[0]);
-        return res.data.data.movieSingle[0];
+        return res.data.metadata.data.movieSingle[0];
       }
     } catch (error) {
       notFound();
@@ -34,7 +34,7 @@ const PlayFilmPage = async ({ params }) => {
         `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
       );
 
-      const categories = categoriesResponse?.data?.data || [];
+      const categories = categoriesResponse?.data?.metadata?.data || [];
 
       if (categories.length > 0) {
         return categories;

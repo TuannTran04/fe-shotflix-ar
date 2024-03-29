@@ -19,6 +19,10 @@ const FormEdit = ({ toast }) => {
       .matches(/^\S*$/, "Username cannot contain spaces")
       .required(),
     email: yup.string().email("Invalid email format").required(),
+    avatar: yup
+      .string()
+      .url("Avatar must be a valid URL starting with 'https://'")
+      .nullable(),
     avatar2: yup
       .mixed()
       .test("isImage", "Only image files are allowed", (value) => {
@@ -34,10 +38,11 @@ const FormEdit = ({ toast }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.login.currentUser);
+  const userId = user?._id;
   const accessToken = user?.accessToken;
   const refreshToken = user?.refreshToken;
   // let axiosJWT = createAxios(user, null, null);
-  let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -172,6 +177,7 @@ const FormEdit = ({ toast }) => {
               placeholder="link ảnh bất kỳ"
               {...register("avatar", { required: false })}
             />
+            {<span className="text-red-500">{errors.avatar?.message}</span>}
           </div>
 
           <div className="mb-[20px]">

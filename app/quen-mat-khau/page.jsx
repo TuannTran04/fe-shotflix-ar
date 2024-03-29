@@ -86,10 +86,13 @@ const ForgetPage = () => {
       setIsLoading(false);
 
       if (error?.response?.data?.code == 400) {
-        toast(error?.response?.data?.mes);
+        toast(error?.response?.data?.message);
+      }
+      if (error?.response?.data?.code == 401) {
+        toast(error?.response?.data?.message);
       }
       if (error?.response?.data?.code == 404) {
-        toast(error?.response?.data?.mes);
+        toast(error?.response?.data?.message);
       }
     }
   };

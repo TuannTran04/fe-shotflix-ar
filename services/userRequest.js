@@ -41,7 +41,7 @@ export const forgotPwdUser = async (
       console.log(">>> Response FORGOT VERIFY <<<", response);
       const { password, email } = formData;
       dispatch(registerSuccess({ password, email }));
-      toast(response?.data?.mes);
+      toast(response?.data?.message);
       setIsLoading(false);
       router.push("/dang-nhap");
     }
@@ -50,12 +50,13 @@ export const forgotPwdUser = async (
     setIsLoading(false);
     dispatch(registerFailed());
 
-    if (error?.response?.data?.code == 400) {
-      toast(error?.response?.data?.mes);
-    }
-    if (error?.response?.data?.code == 404) {
-      toast(error?.response?.data?.mes);
-    }
+    const errorCodes = [401, 403, 404];
+
+    errorCodes.forEach((code) => {
+      if (error?.response?.data?.code === code) {
+        toast(error?.response?.data?.message);
+      }
+    });
   }
 };
 

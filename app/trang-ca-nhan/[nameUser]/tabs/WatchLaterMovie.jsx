@@ -16,7 +16,7 @@ const WatchLaterMovie = () => {
   // console.log(">>> store user", user);
   const accessToken = user?.accessToken;
   const userId = user?._id;
-  let axiosJWT = createAxios(user, dispatch, loginSuccess, router);
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const [arrWatchLaterMovie, setArrWatchLaterMovie] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +35,8 @@ const WatchLaterMovie = () => {
         // console.log(">>> Watch Later Film <<<", res.data.markBookMovie);
 
         if (res.status === 200) {
-          isMounted && setArrWatchLaterMovie(res.data.markBookMovie);
+          isMounted &&
+            setArrWatchLaterMovie(res.data.metadata?.user?.markBookMovie);
           setIsLoading(false);
         }
       } catch (err) {
@@ -64,6 +65,7 @@ const WatchLaterMovie = () => {
               key={movie._id}
               movie={movie}
               toast={toast}
+              arrWatchLaterMovie={arrWatchLaterMovie}
               setArrWatchLaterMovie={setArrWatchLaterMovie}
             />
           ))

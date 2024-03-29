@@ -60,7 +60,7 @@ export async function generateMetadata({}) {
     //   };
     // }
 
-    let infoShotflix = res?.data?.data?.[0];
+    let infoShotflix = res?.data?.metadata?.data?.[0];
 
     if (!infoShotflix) {
       return {
@@ -69,7 +69,7 @@ export async function generateMetadata({}) {
       };
     }
 
-    // console.log("res meta", infoShotflix);
+    console.log("res meta", infoShotflix);
 
     return {
       // metadataBase: new URL("http://localhost:3001"),

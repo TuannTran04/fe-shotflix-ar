@@ -1,7 +1,7 @@
 import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
 import { forwardRef, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +16,8 @@ import {
 } from "../../../store/apiRequest";
 import { memo } from "react";
 import { io } from "socket.io-client";
+import { createAxios } from "@/utils/createInstance";
+import { loginSuccess } from "@/store/authSlice";
 
 function timeAgo(createdAt) {
   const currentTime = new Date();
@@ -60,10 +62,13 @@ const CommentUI = ({
   // socket,
 }) => {
   const router = useRouter();
+  const dispatch = useDispatch();
   // console.log("comment", router);
   const user = useSelector((state) => state.auth.login.currentUser);
   const userId = user?._id;
   const accessToken = user?.accessToken;
+
+  let axiosJWT = createAxios(user, dispatch, loginSuccess, router, userId);
 
   const [textInputs, setTextInputs] = useState({
     updatedText: "",
@@ -121,18 +126,18 @@ const CommentUI = ({
       );
       console.log(">>> handleLoadMoreReplyComment <<<", res);
 
-      if (res.data.data.length === 0) {
+      if (res.data.metadata.Imagedata.length === 0) {
         setHasMoreReplyCmt(false);
         setLoadingReplyCmt(false);
       }
 
-      if (res.data.code === 200 && res.data.data.length > 0) {
+      if (res.status === 200 && res.data.metadata.Imagedata.length > 0) {
         setComments((prevComments) =>
           prevComments.map((prevComment) => {
             if (prevComment._id === commentId) {
               return {
                 ...prevComment,
-                replies: [...prevComment.replies, ...res.data.data],
+                replies: [...prevComment.replies, ...res.data.metadata.data],
               };
             }
             return prevComment;
@@ -158,18 +163,18 @@ const CommentUI = ({
       );
       console.log(">>> handleLoadMoreReplyComment <<<", res);
 
-      if (res.data.data.length === 0) {
+      if (res.data.metadata.data.length === 0) {
         setHasMoreReplyCmt(false);
         setLoadingReplyCmt(false);
       }
 
-      if (res.data.code === 200 && res.data.data.length > 0) {
+      if (res.status === 200 && res.data.metadata.data.length > 0) {
         setComments((prevComments) =>
           prevComments.map((prevComment) => {
             if (prevComment._id === commentId) {
               return {
                 ...prevComment,
-                replies: [...prevComment.replies, ...res.data.data],
+                replies: [...prevComment.replies, ...res.data.metadata.data],
               };
             }
             return prevComment;
@@ -245,7 +250,9 @@ const CommentUI = ({
             movieId,
             // commentId, //cmt parent
             item._id, //cmt ma` minh` rep
-            replyText
+            replyText,
+            accessToken,
+            axiosJWT
           );
           console.log(">>> resAddNotify <<<", resAddNotify);
 

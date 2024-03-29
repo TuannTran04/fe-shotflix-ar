@@ -19,7 +19,7 @@ const EditInfoUser = async ({ params }) => {
         `${process.env.NEXT_PUBLIC_URL}/api/v1/category`
       );
 
-      const categories = categoriesResponse?.data?.data || [];
+      const categories = categoriesResponse?.data?.metadata?.data || [];
 
       if (categories.length > 0) {
         return categories;
