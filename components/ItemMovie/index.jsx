@@ -220,7 +220,7 @@ const ItemMovie = ({
                 {title}
               </Link>
             </h3>
-            <p className="text-sm opacity-50 whitespace-nowrap text-ellipsis overflow-hidden">
+            <p className="text-sm opacity-50 whitespace-nowrap text-ellipsis overflow-hidden c">
               {titleWithoutAccent}
             </p>
             <p className="text-[10px] opacity-50 whitespace-nowrap text-ellipsis overflow-hidden">
