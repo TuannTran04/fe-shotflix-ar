@@ -93,3 +93,15 @@ const PlayFilmPage = async ({ params }) => {
 };
 
 export default PlayFilmPage;
+
+// sai dc cho page route thoi
+// export async function getServerSideProps({ params }) {
+//   const nameUser = "test";
+//   console.log("getServerSideProps nameUser", nameUser);
+
+//   return {
+//     props: {
+//       nameUser,
+//     },
+//   };
+// }
