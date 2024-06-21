@@ -65,7 +65,7 @@ const ItemMovie = ({
         )
       ) {
         const res = await addFavoriteMovie(userId, _id, accessToken, axiosJWT);
-
+        console.log(res);
         if (res.status === 200) {
           toast.success(res?.data?.metadata?.message);
         }
@@ -220,7 +220,7 @@ const ItemMovie = ({
                 {title}
               </Link>
             </h3>
-            <p className="text-sm opacity-50 whitespace-nowrap text-ellipsis overflow-hidden c">
+            <p className="text-sm opacity-50 whitespace-nowrap text-ellipsis overflow-hidden">
               {titleWithoutAccent}
             </p>
             <p className="text-[10px] opacity-50 whitespace-nowrap text-ellipsis overflow-hidden">

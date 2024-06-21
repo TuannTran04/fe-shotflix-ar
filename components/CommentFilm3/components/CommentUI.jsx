@@ -892,24 +892,21 @@ const CommentUI = ({
             </span>
           )} */}
 
-            {item.childCount > 0 &&
-              replyComments?.length > 0 &&
-              !hasMaxChildCmt &&
-              collapsedCmt && (
-                <div>
-                  {loadingChildCmt ? ( // Kiểm tra loading, nếu đang loading thì hiển thị component loading
-                    <Loading />
-                  ) : (
-                    <span
-                      className="inline-block text-[11px] text-[#0285b5] cursor-pointer italic hover:underline"
-                      onClick={() => handleLoadMoreReplyComment(item._id)} // button 2
-                    >
-                      <i className="fa-solid fa-reply mr-[6px] text-[#0285b5] rotate-180"></i>
-                      <span>Xem thêm phản hồi</span>
-                    </span>
-                  )}
-                </div>
-              )}
+            {item.childCount > 0 && !hasMaxChildCmt && collapsedCmt && (
+              <div>
+                {loadingChildCmt ? ( // Kiểm tra loading, nếu đang loading thì hiển thị component loading
+                  <Loading />
+                ) : (
+                  <span
+                    className="inline-block text-[11px] text-[#0285b5] cursor-pointer italic hover:underline"
+                    onClick={() => handleLoadMoreReplyComment(item._id)} // button 2
+                  >
+                    <i className="fa-solid fa-reply mr-[6px] text-[#0285b5] rotate-180"></i>
+                    <span>Xem thêm phản hồi</span>
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
